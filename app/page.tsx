@@ -199,7 +199,7 @@ export default function Home() {
               Berent Baysal
             </h1>
             <p className="text-sm text-slate-300">
-              I build and debug physical systems.
+              I build shit that works
             </p>
 
             {/* Location with pin */}
