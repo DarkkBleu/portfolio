@@ -217,7 +217,7 @@ export default function Home() {
           <div className="flex items-center gap-4 pt-1">
             {/* Email */}
             <a
-              href="mailto:YOUR_EMAIL_HERE"
+              href="mailto:berentbaysal02@gmail.com"
               className="opacity-60 hover:opacity-100 transition"
             >
               <img
@@ -419,6 +419,7 @@ function SkillItem({ logo, label }: { logo: string; label: string }) {
   );
 }
 
+
 /* ==============================
    PROJECTS COVERFLOW + DETAILS
 ================================*/
@@ -451,6 +452,7 @@ function ProjectsCoverflow() {
   };
 
   const go = (dir: "prev" | "next") => {
+    setDetailPhase("hidden");
     setCurrentIndex((prev) =>
       dir === "prev"
         ? (prev - 1 + PROJECTS.length) % PROJECTS.length
@@ -508,61 +510,48 @@ function ProjectsCoverflow() {
         onMouseLeave={handleMouseLeave}
         className="mt-8 relative"
       >
-        {/* BASE GRID OVER WHOLE SECTION */}
-        <div
-          className="pointer-events-none absolute inset-0 z-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(148,163,184,0.45) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(148,163,184,0.45) 1px, transparent 1px)
-            `,
-            backgroundSize: "40px 40px",
-            opacity: 1,
-          }}
-        />
+        {/* BACKGROUND: dot field, lifted higher */}
+<div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+  <div
+    className="absolute -inset-[40%]"
+    style={{
+      top: "-10%", // ⬆ move dots upward (adjustable)
+      backgroundImage:
+        "radial-gradient(circle, rgba(148,163,184,0.38) 1px, transparent 1px)",
+      backgroundSize: "32px 32px",
+      opacity: 0.7,
+    }}
+  />
 
-        {/* VIGNETTE */}
-        <div
-          className="pointer-events-none absolute inset-0 z-20"
-          style={{
-            background:
-              "radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0.85) 55%, rgba(0,0,0,1) 80%)",
-          }}
-        />
-
-        {/* CURSOR-REACTIVE HIGHLIGHT OVER GRID */}
-        {cursorPos && (
-          <div
-            className="pointer-events-none absolute inset-0 z-10 transition-opacity duration-400 ease-out"
-            style={{
-              opacity: cursorPos ? 0.75 : 0,
-              background: cursorPos
-                ? `radial-gradient(circle at ${cursorPos.x}px ${cursorPos.y}px,
-                    rgba(148,163,184,0.55),
-                    transparent 20%)`
-                : "none",
-              mixBlendMode: "screen",
-            }}
-          />
-        )}
+</div>
+{/* SOFT VIGNETTE OVER DOTS */}
+<div
+  className="pointer-events-none absolute inset-0 z-10"
+  style={{
+    background:
+      "radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,1) 100%)",
+  }}
+/>
 
         {/* FOREGROUND CONTENT */}
-        <div className="relative z-30 mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col justify-between">
+        <div className="relative z-30 mx-auto flex w-full max-w-6xl flex-col items-center gap-6 md:gap-8 py-8 md:py-10">
           {/* CAROUSEL AREA */}
-          <div className="relative flex flex-1 items-center justify-center">
+<div className="relative flex w-full items-center justify-center
+                h-[18rem] sm:h-[22rem] md:h-[26rem] lg:h-[30rem]">
+
             {/* CENTER GLOW */}
-            <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-80 w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(148,163,184,0.35),_transparent_70%)] blur-[95px]" />
+            <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-72 w-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(148,163,184,0.35),_transparent_70%)] blur-[90px]" />
 
             {/* ARROWS */}
             <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-30 flex items-center justify-between">
               <button
                 onClick={() => go("prev")}
-                className="pointer-events-auto ml-2 flex h-9 w-9 items-center justify-center rounded-full border border-slate-700/30 bg-black/40 text-[11px] text-slate-400 transition hover:border-slate-500/60 hover:bg-black/80 hover:text-slate-100"
+                className="pointer-events-auto ml-1 sm:ml-2 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-slate-700/30 bg-black/40 text-[10px] sm:text-[11px] text-slate-400 transition hover:border-slate-500/60 hover:bg-black/80 hover:text-slate-100"
                 aria-label="Previous project"
               >
                 <svg
                   viewBox="0 0 24 24"
-                  className="h-4 w-4"
+                  className="h-3.5 w-3.5 sm:h-4 sm:w-4"
                   aria-hidden="true"
                 >
                   <path
@@ -578,12 +567,12 @@ function ProjectsCoverflow() {
 
               <button
                 onClick={() => go("next")}
-                className="pointer-events-auto mr-2 flex h-9 w-9 items-center justify-center rounded-full border border-slate-700/30 bg-black/40 text-[11px] text-slate-400 transition hover:border-slate-500/60 hover:bg-black/80 hover:text-slate-100"
+                className="pointer-events-auto mr-1 sm:mr-2 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-slate-700/30 bg-black/40 text-[10px] sm:text-[11px] text-slate-400 transition hover:border-slate-500/60 hover:bg-black/80 hover:text-slate-100"
                 aria-label="Next project"
               >
                 <svg
                   viewBox="0 0 24 24"
-                  className="h-4 w-4"
+                  className="h-3.5 w-3.5 sm:h-4 sm:w-4"
                   aria-hidden="true"
                 >
                   <path
@@ -615,13 +604,13 @@ function ProjectsCoverflow() {
                 const isActive = d === 0;
 
                 const scale =
-                  d === 0 ? 1.28 : d === 1 ? 1.04 : d === 2 ? 0.94 : 0.86;
+                  d === 0 ? 1.18 : d === 1 ? 1.02 : d === 2 ? 0.92 : 0.84;
 
                 const cardOpacity =
                   d === 0 ? 1 : d === 1 ? 0.6 : d === 2 ? 0.35 : 0.18;
 
                 const translateY =
-                  d === 0 ? 0 : d === 1 ? 26 : d === 2 ? 44 : 60;
+                  d === 0 ? 0 : d === 1 ? 22 : d === 2 ? 40 : 56;
                 const zIndex = 30 - d;
                 const rotateY =
                   d === 0 ? 0 : delta < 0 ? 12 * d : -12 * d;
@@ -649,7 +638,7 @@ function ProjectsCoverflow() {
                       <img
                         src={p.image}
                         alt={p.title}
-                        className="h-[22rem] w-[22rem] sm:h-[24rem] sm:w-[24rem] object-cover"
+                        className="h-56 w-56 sm:h-64 sm:w-64 md:h-80 md:w-80 lg:h-[22rem] lg:w-[22rem] object-cover"
                       />
 
                       {/* Accent gradient overlay */}
@@ -676,7 +665,7 @@ function ProjectsCoverflow() {
                       />
 
                       {/* Bottom label */}
-                      <div className="relative flex items-center justify-between px-6 pb-4 pt-2 text-[10px] font-mono uppercase tracking-[0.18em] text-slate-400">
+                      <div className="relative flex items-center justify-between px-4 sm:px-6 pb-3 sm:pb-4 pt-2 text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.18em] text-slate-400">
                         <span className="inline-flex items-center gap-1">
                           <span
                             className="inline-block h-2 w-2 rounded-full"
@@ -684,7 +673,7 @@ function ProjectsCoverflow() {
                           />
                           <span>{String(i + 1).padStart(2, "0")}</span>
                         </span>
-                        <span className="truncate max-w-[180px] text-right text-[9px] text-slate-500">
+                        <span className="truncate max-w-[150px] sm:max-w-[180px] text-right text-[8px] sm:text-[9px] text-slate-500">
                           {p.title}
                         </span>
                       </div>
@@ -695,8 +684,8 @@ function ProjectsCoverflow() {
             </div>
           </div>
 
-          {/* BOTTOM TEXT */}
-          <div className="flex flex-col items-center gap-2 pb-6">
+          {/* BOTTOM TEXT – hide on very small screens */}
+          <div className="hidden sm:flex flex-col items-center gap-2 pb-2 text-center">
             <div className="flex items-center gap-2 text-[11px] text-slate-500">
               <span className="uppercase tracking-[0.2em]">
                 Scroll for details
@@ -746,7 +735,7 @@ function ProjectsCoverflow() {
                     {isDriveVideo ? (
                       <iframe
                         src={src}
-                        className="w-full h-[320px] md:h-[420px] lg:h-[460px] rounded-xl"
+                        className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[460px] rounded-xl"
                         allow="autoplay; encrypted-media"
                         allowFullScreen
                       />
@@ -754,7 +743,7 @@ function ProjectsCoverflow() {
                       <img
                         src={src}
                         alt={`${current.title} view ${idx + 1}`}
-                        className="w-full h-[320px] md:h-[420px] lg:h-[460px] object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+                        className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[460px] object-cover transition-transform duration-200 group-hover:scale-[1.02]"
                       />
                     )}
 
@@ -954,6 +943,7 @@ function ProjectsCoverflow() {
     </>
   );
 }
+
 
 /* ==============================
    LIGHTBOX COMPONENT
