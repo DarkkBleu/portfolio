@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 // --- LIGHT PROJECT DATA ---
+// --- LIGHT PROJECT DATA ---
 type Project = {
   id: string;
   title: string;
@@ -14,8 +15,10 @@ type Project = {
   github?: string;
   fdr?: string; // final design review / PDF link
   gallery?: string[]; // extra images for the detail section
-  highlights?: string[]; // bullet points
+  highlights?: string[]; // SHORT bullets for sticky panel
   tech?: string[]; // tech stack / tools
+  abstractTitle?: string; // bottom "paper-like" heading
+  abstract?: string; // bottom abstract-style paragraph
 };
 
 const PROJECTS: Project[] = [
@@ -24,30 +27,30 @@ const PROJECTS: Project[] = [
     title: "Autonomous Nerf Turret",
     accent: "#f97316",
     role: "Python • Mechatronics",
-    year: "2022",
+    year: "2024",
     summary:
       "Autonomous Nerf turret that detects people using a thermal sensor, aims with pan/tilt motors, and fires darts for a mechatronics class competition.",
     image: "/projects/nerf-turret-main.jpg",
     github: "https://github.com/fmoren05/Term-Project",
     gallery: [
-  "/projects/nerf-turret-main.jpg",
-  "/projects/nerf-turret-side.jpg",
-  "/projects/nerf-turret-thermal.jpg",
-
-  // 🎥 Google Drive videos – in the order you want them
-  "https://drive.google.com/file/d/1898FJT0jIi6c01ILZBM89t2987Pqvz_G/preview",
-  "https://drive.google.com/file/d/1l8kSO0vYaUGgQLaVvaD6BNZ9J0VO4BSx/preview",
-  "https://drive.google.com/file/d/1mLuf-DcBSHBue66RncZfcMSVJwaqkHj2/preview",
-
-  "/projects/nerf-turret-internals.jpg"
-],
-
+      "/projects/nerf-turret-main.jpg",
+      "/projects/nerf-turret-side.jpg",
+      "/projects/nerf-turret-thermal.jpg",
+      // 🎥 Google Drive videos – in the order you want them
+      "https://drive.google.com/file/d/1898FJT0jIi6c01ILZBM89t2987Pqvz_G/preview",
+      "https://drive.google.com/file/d/1l8kSO0vYaUGgQLaVvaD6BNZ9J0VO4BSx/preview",
+      "https://drive.google.com/file/d/1mLuf-DcBSHBue66RncZfcMSVJwaqkHj2/preview",
+      "/projects/nerf-turret-internals.jpg",
+    ],
     tech: ["Python", "Thermal sensor", "DC motors", "Mechanisms", "Control"],
     highlights: [
-      "Linked a thermal camera snapshot to a motor control loop that automatically aims at the hottest region in the frame.",
-      "Designed the pan/tilt and firing mechanism to minimize backlash and avoid jams during rapid firing in competition.",
-      "Realized column-wise temperature averaging would make target selection more robust than a single hottest pixel.",
+      "Thermal snapshot → target location → closed-loop pan/tilt control.",
+      "Mechanism and feed path tuned to avoid jams during rapid firing.",
+      "Used column-wise temperature averaging for robust target selection.",
     ],
+    abstractTitle: "Control Loop & Competition Context",
+    abstract:
+      "Built an autonomous Nerf turret for a mechatronics course competition, where the goal was to detect and tag opponents as they entered the field of view. The system takes a thermal snapshot, reduces it to column-wise temperature profiles, selects a target region, and feeds that into a pan/tilt motor control loop that tracks and fires. Most of the engineering work went into edge cases: filtering noisy thermal readings, avoiding spurious hot spots, and preventing the mechanism from driving into hard stops when the sensor momentarily lost the target. The final system could reliably acquire and track warm targets under competition conditions without manual intervention.",
   },
 
   {
@@ -76,14 +79,15 @@ const PROJECTS: Project[] = [
       "Competition robot design",
     ],
     highlights: [
-      "Designed and manufactured the full chassis and drivetrain for a competition robot navigating a 1/3-scale interior of a naval ship.",
-      "Robot handled tight turns, stair ascent/descent, and balancing on a rocking table while interacting with light switches.",
-      "Mixed 3D-printed parts, aluminum T-slot, and sheet metal to keep the frame lightweight and reduce load on the drive motors.",
-      "Gained end-to-end experience taking a mechanical concept through design, fabrication, and competition validation.",
+      "Owned chassis and drivetrain design for a 1/3-scale ship interior course.",
+      "Validated stair ascent/descent, tight turns, and rocking-table stability.",
+      "Mixed 3D prints, T-slot, and sheet metal to keep weight and loads in check.",
     ],
+    abstractTitle: "Course Constraints & Chassis Decisions",
+    abstract:
+      "The Robot Rodeo course combined stairs, tight corridors, light switches, and a rocking platform inside a 1/3-scale ship interior. Those constraints drove nearly every chassis decision: wheelbase, center of gravity, clearances, and how the drivetrain handled transitions between flat ground and stair edges. I iterated layouts in CAD, then built fast hardware mockups to validate that the robot did not bottom out, hang up on stair lips, or tip during aggressive maneuvers. Balancing on the rocking platform required thinking about how the contact patch shifted as the table moved and how quickly the robot could correct its pose. The final configuration provided enough stability and maneuverability to complete the course tasks without major redesigns mid-competition.",
   },
 
-  // CubeSat project
   {
     id: "cubesat",
     title: "CubeSat Thermal & Deorbit Systems",
@@ -109,15 +113,15 @@ const PROJECTS: Project[] = [
       "RF & radios",
     ],
     highlights: [
-      "Worked on AMDROHP, an oscillating heat pipe radiator deployed with spring elements that also act as the working-fluid channels.",
-      "Owned deployment mechanism details, including hinge placement, dampers, and the features that secure radiators prior to deployment.",
-      "Contributed to a deployable drag sail system for a 1U CubeSat to reduce deorbit time as part of space debris mitigation efforts.",
-      "Designed a modular battery bracket that can scale pack capacity based on mission energy budget requirements.",
-      "Gained hands-on experience with CubeSat radio systems during high-stress communication and link-testing sessions.",
+      "Helped design AMDROHP, an oscillating heat pipe radiator with spring-deployed panels.",
+      "Owned deployment details: hinge layouts, damping, and pre-deployment latching features.",
+      "Worked on drag-sail deorbit concept and modular CubeSat battery packing.",
     ],
+    abstractTitle: "CubeSat Research & Flight Systems",
+    abstract:
+      "On the CubeSat team I contributed to two major systems: AMDROHP, an oscillating heat pipe radiator, and a deployable drag sail for deorbit. AMDROHP uses spring-driven panels that double as working-fluid channels, allowing the radiator to stow compactly and deploy on orbit; I focused on the deployment mechanism, including hinge placement, damping elements, and features that mechanically secure the radiators prior to release. For the drag sail, I supported concept development and testing for a 1U configuration aimed at reducing deorbit time as part of space debris mitigation. In parallel, I designed a modular battery bracket that could scale pack capacity with different mission energy budgets. The work also exposed me to RF link testing and the operational stress of bringing up satellite radios, which clarified how sensitive flight systems are to integration and test discipline.",
   },
 
-  // Baja SAE project
   {
     id: "baja",
     title: "Baja SAE Design & Manufacturing",
@@ -142,11 +146,13 @@ const PROJECTS: Project[] = [
       "Design for manufacturing",
     ],
     highlights: [
-      "Designed a 3D-printed pedal that cut peak stress roughly in half compared to the previous design, enabling more aggressive maneuvers and better reliability.",
-      "Developed 3D-printed tab mounting fixtures to solve awkward-angle welding problems and improve repeatability.",
-      "Helped create a test method to determine tire moment of inertia and feed that data into both hand calcs and simulations.",
-      "Spent hundreds of hours on lathes and mills creating Baja parts, which heavily shaped how I think about designing for manufacturability.",
+      "Redesigned a 3D-printed pedal to roughly halve peak stress vs. the previous design.",
+      "Created 3D-printed tab fixtures to solve awkward-angle welding and improve repeatability.",
+      "Helped build a tire inertia test method and spent hundreds of hours machining Baja parts.",
     ],
+    abstractTitle: "Baja SAE: Design, Testing & Machining",
+    abstract:
+      "On the Baja SAE team I split time between design and hands-on manufacturing. I redesigned the driver pedal as a 3D-printed component, cutting peak stress by roughly half compared to the previous iteration and enabling more aggressive maneuvers without failures. To address the recurring problem of welding small tabs at odd angles on the frame, I developed 3D-printed fixturing that located parts consistently and sped up fabrication. I also helped define a test method for tire moment of inertia so that the team had measured data for both hand calculations and simulations. Most of my machining experience came from this car: spending hundreds of hours on lathes and mills shaped how I think about tolerances, set-ups, and how design choices translate into actual manufacturing effort.",
   },
 
   {
@@ -159,7 +165,15 @@ const PROJECTS: Project[] = [
       "Multi-channel sensor logger for capturing real-world signals and replaying them into analysis scripts.",
     image: "/projects/sensor-logger.jpg",
     tech: ["Embedded", "SD logging"],
+    highlights: [
+      "Captures multi-channel data with stable timestamps to SD.",
+      "Designed around clean shutdown and log recovery after power loss.",
+    ],
+    abstractTitle: "Logging Architecture",
+    abstract:
+      "This sensor logger was built to capture multi-channel signals from real hardware and replay those traces into offline analysis scripts. The design emphasized timestamp stability and log integrity rather than UI, with a focus on how sample timing propagates into downstream control and estimation algorithms. The firmware and file format were structured so that logs would remain recoverable even if power was pulled mid-run, minimizing the amount of data lost to unexpected resets and making the tool useful for long-duration or failure-prone tests.",
   },
+
   {
     id: "portfolio",
     title: "Portfolio Surface",
@@ -170,7 +184,15 @@ const PROJECTS: Project[] = [
       "Next.js portfolio with interactive skill band and project coverflow, tuned to feel like a hardware UI.",
     image: "/projects/portfolio.jpg",
     tech: ["Next.js", "React", "Tailwind"],
+    highlights: [
+      "Built the skill band, coverflow, and detail views in React/Next.js.",
+      "Motion and opacity tuned to feel like a hardware-status UI, not a blog.",
+    ],
+    abstractTitle: "Interaction & Visual Language",
+    abstract:
+      "This site doubles as a design project. The scrolling skill band, coverflow hero, and cursor-reactive grid are tuned to feel like a hardware UI rather than a marketing page. Most of the effort went into motion curves, opacity ramps, and layout choices that keep the interface readable while still conveying that the owner works on physical systems. The result is a portfolio surface that behaves more like an instrument cluster for projects than a traditional scroll-down résumé.",
   },
+
   {
     id: "hardware-lab",
     title: "Hardware Lab Setup",
@@ -181,6 +203,13 @@ const PROJECTS: Project[] = [
       "Bench setup with scopes, supplies, CAN tools, and PCBs optimized for fast bring-up and debug of physical systems.",
     image: "/projects/hardware-lab.jpg",
     tech: ["Lab tooling", "Instrumentation"],
+    highlights: [
+      "Bench organized around fast bring-up and minimal recabling.",
+      "Scopes, supplies, CAN tools, and boards laid out for quick iteration.",
+    ],
+    abstractTitle: "Bench Workflow",
+    abstract:
+      "The lab layout is optimized around debug speed rather than storage density. Scopes, power supplies, CAN tools, and boards are arranged so that most experiments can be set up by moving probes and cables a short distance instead of rethreading the entire bench. The goal is to reduce setup friction, keep common test paths semi-permanent, and spend the majority of time on actual troubleshooting and characterization rather than rewiring. That layout directly influences how quickly hardware ideas can go from sketch to measured behavior.",
   },
 ];
 
@@ -229,7 +258,7 @@ export default function Home() {
 
             {/* LinkedIn */}
             <a
-              href="https://www.linkedin.com/in/YOUR-LINKEDIN-ID/"
+              href="https://www.linkedin.com/in/berent-d-baysal/"
               target="_blank"
               rel="noopener noreferrer"
               className="opacity-60 hover:opacity-100 transition"
