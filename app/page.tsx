@@ -2,8 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
-// --- LIGHT PROJECT DATA ---
-// --- LIGHT PROJECT DATA ---
+// --- LIGHT PROJECT DATA --- HEELLOOO DEAR VIEWER
 type Project = {
   id: string;
   title: string;
@@ -14,6 +13,7 @@ type Project = {
   image: string; // primary image
   github?: string;
   fdr?: string; // final design review / PDF link
+  polysat_website?: string; //polysat website lol
   gallery?: string[]; // extra images for the detail section
   highlights?: string[]; // SHORT bullets for sticky panel
   tech?: string[]; // tech stack / tools
@@ -25,11 +25,11 @@ const PROJECTS: Project[] = [
   {
     id: "nerf-turret",
     title: "Autonomous Nerf Turret",
-    accent: "#f97316",
-    role: "Python • Mechatronics",
+    accent: "#e96112",
+    role: "Python",
     year: "2024",
     summary:
-      "Autonomous Nerf turret that detects people using a thermal sensor, aims with pan/tilt motors, and fires darts for a mechatronics class competition.",
+      "Turret that aims using a thermal sensor",
     image: "/projects/nerf-turret-main.jpg",
     github: "https://github.com/fmoren05/Term-Project",
     gallery: [
@@ -42,25 +42,23 @@ const PROJECTS: Project[] = [
       "https://drive.google.com/file/d/1mLuf-DcBSHBue66RncZfcMSVJwaqkHj2/preview",
       "/projects/nerf-turret-internals.jpg",
     ],
-    tech: ["Python", "Thermal sensor", "DC motors", "Mechanisms", "Control"],
+
     highlights: [
-      "Thermal snapshot → target location → closed-loop pan/tilt control.",
-      "Mechanism and feed path tuned to avoid jams during rapid firing.",
-      "Used column-wise temperature averaging for robust target selection.",
+      "Closed-loop precise PID control.",
+      "Custom feed and shoot mechanism.",
+      "Column-wise temperature averaging for robust target selection.",
     ],
     abstractTitle: "Control Loop & Competition Context",
-    abstract:
-      "Built an autonomous Nerf turret for a mechatronics course competition, where the goal was to detect and tag opponents as they entered the field of view. The system takes a thermal snapshot, reduces it to column-wise temperature profiles, selects a target region, and feeds that into a pan/tilt motor control loop that tracks and fires. Most of the engineering work went into edge cases: filtering noisy thermal readings, avoiding spurious hot spots, and preventing the mechanism from driving into hard stops when the sensor momentarily lost the target. The final system could reliably acquire and track warm targets under competition conditions without manual intervention.",
-  },
+    },
 
   {
     id: "robot-rodeo",
-    title: "Cal Poly Robot Rodeo Robot",
+    title: "Cal Poly Robot Rodeo",
     accent: "#38bdf8",
-    role: "Mechanical • Robotics",
-    year: "2023",
+    role: "Python",
+    year: "2024",
     summary:
-      "Competition robot for Cal Poly’s Robot Rodeo that climbed stairs, toggled switches, and balanced on a rocking platform inside a 1/3-scale ship interior.",
+      "Robot that climbs stairs and toggles switches.",
     image: "/projects/robot-rodeo-main.jpg",
     fdr: "https://drive.google.com/file/d/1n4Sx_59qJmOYlScuPie2GpwRyVYjAOwJ/view?usp=sharing",
     gallery: [
@@ -71,84 +69,62 @@ const PROJECTS: Project[] = [
       "/projects/robot-rodeo-drivetrain.jpg",
       "/projects/robot-rodeo-balance.jpg",
     ],
-    tech: [
-      "3D printed structure",
-      "Aluminum T-slot extrusions",
-      "Aluminum sheet",
-      "Stair-climbing drivetrain",
-      "Competition robot design",
-    ],
+   
     highlights: [
-      "Owned chassis and drivetrain design for a 1/3-scale ship interior course.",
-      "Validated stair ascent/descent, tight turns, and rocking-table stability.",
-      "Mixed 3D prints, T-slot, and sheet metal to keep weight and loads in check.",
+      "Owned chassis and drivetrain design",
+      "Implemented Raspberry Pi based wireless control",
+      "Manufactured and assembled all frame and drivetrain components",
     ],
     abstractTitle: "Course Constraints & Chassis Decisions",
-    abstract:
-      "The Robot Rodeo course combined stairs, tight corridors, light switches, and a rocking platform inside a 1/3-scale ship interior. Those constraints drove nearly every chassis decision: wheelbase, center of gravity, clearances, and how the drivetrain handled transitions between flat ground and stair edges. I iterated layouts in CAD, then built fast hardware mockups to validate that the robot did not bottom out, hang up on stair lips, or tip during aggressive maneuvers. Balancing on the rocking platform required thinking about how the contact patch shifted as the table moved and how quickly the robot could correct its pose. The final configuration provided enough stability and maneuverability to complete the course tasks without major redesigns mid-competition.",
   },
 
   {
     id: "cubesat",
-    title: "CubeSat Thermal & Deorbit Systems",
+    title: "CubeSat",
     accent: "#22c55e",
-    role: "Thermal • Mechanisms",
-    year: "2022",
+    role: "Python • Cpp • MATLAB",
+    year: "2020-2024",
     summary:
-      "Contributed to an oscillating heat pipe radiator, deployable drag sail, and modular battery pack for a 1U CubeSat focused on deorbit and space sustainability.",
+      "Worked on mechanical systems.",
     image: "/projects/cubesat-main.jpg",
+    polysat_website: "https://www.polysat.org/in-development",
     gallery: [
       "/projects/cubesat-main.jpg",
-      "/projects/cubesat-amdroph.jpg",
+      "/projects/cubesat-amdrohp.jpg",
       "/projects/cubesat-drag-sail.jpg",
       "/projects/cubesat-battery-pack.jpg",
-      "/projects/cubesat-ground-station.jpg",
+      "https://drive.google.com/file/d/1beix8_-4QKVdmhAQNja72RonBiP-tqxd/preview",
     ],
-    tech: [
-      "CubeSat",
-      "Oscillating heat pipe",
-      "Deployable mechanisms",
-      "Drag sail",
-      "Battery packaging",
-      "RF & radios",
-    ],
+    
     highlights: [
-      "Helped design AMDROHP, an oscillating heat pipe radiator with spring-deployed panels.",
-      "Owned deployment details: hinge layouts, damping, and pre-deployment latching features.",
-      "Worked on drag-sail deorbit concept and modular CubeSat battery packing.",
+      "Helped design an oscillating heat pipe radiator with spring-deployed panels.",
+      "Owned hinge layouts, damping, and pre-deployment latching features.",
+      "Worked on a drag-sail deorbit concept.",
     ],
     abstractTitle: "CubeSat Research & Flight Systems",
-    abstract:
-      "On the CubeSat team I contributed to two major systems: AMDROHP, an oscillating heat pipe radiator, and a deployable drag sail for deorbit. AMDROHP uses spring-driven panels that double as working-fluid channels, allowing the radiator to stow compactly and deploy on orbit; I focused on the deployment mechanism, including hinge placement, damping elements, and features that mechanically secure the radiators prior to release. For the drag sail, I supported concept development and testing for a 1U configuration aimed at reducing deorbit time as part of space debris mitigation. In parallel, I designed a modular battery bracket that could scale pack capacity with different mission energy budgets. The work also exposed me to RF link testing and the operational stress of bringing up satellite radios, which clarified how sensitive flight systems are to integration and test discipline.",
+
   },
 
   {
     id: "baja",
     title: "Baja SAE Design & Manufacturing",
     accent: "#fbbf24",
-    role: "Design • Manufacturing",
-    year: "2021",
+    role: "matlab",
+    year: "2021-2023",
     summary:
-      "Design and manufacturing work on a Baja SAE off-road car, including a 3D-printed pedal, tab mounting fixtures, tire inertia testing, and extensive manual machining.",
+      "Design and manufacturing work.",
     image: "/projects/baja-main.jpg",
     gallery: [
       "/projects/baja-main.jpg",
       "/projects/baja-pedal.jpg",
       "/projects/baja-tabs.jpg",
-      "/projects/baja-machining.jpg",
-    ],
-    tech: [
-      "Baja SAE",
-      "3D printing",
-      "Fixture design",
-      "Manual machining",
-      "Testing methods",
-      "Design for manufacturing",
+      "/projects/baja-team.jpg",
     ],
     highlights: [
-      "Redesigned a 3D-printed pedal to roughly halve peak stress vs. the previous design.",
-      "Created 3D-printed tab fixtures to solve awkward-angle welding and improve repeatability.",
-      "Helped build a tire inertia test method and spent hundreds of hours machining Baja parts.",
+      "Redesigned the pedal.",
+      "Created 3D-printed tab fixtures to solve awkward-angle welding.",
+      "Helped build a tire inertia test method.",
+      "Learned how to design for manufacturing.",
     ],
     abstractTitle: "Baja SAE: Design, Testing & Machining",
     abstract:
@@ -222,7 +198,7 @@ export default function Home() {
           {/* LEFT BLOCK — NAME, TAGLINE, LOCATION */}
           <div className="space-y-2">
             <p className="text-[11px] uppercase tracking-[0.25em] text-slate-500">
-              Hardware Validation Engineer
+              Mechatronics Test Engineer
             </p>
             <h1 className="text-3xl font-semibold md:text-5xl">
               Berent Baysal
@@ -878,82 +854,100 @@ function ProjectsCoverflow() {
               </div>
             )}
 
-            {/* Code / FDR buttons */}
-            {(current.github || current.fdr) && (
-              <div
-                className={[
-                  "pt-2 flex flex-wrap gap-2 transform-gpu transition-all duration-400 ease-out",
-                  detailPhase === "visible"
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-3",
-                ].join(" ")}
-                style={{ transitionDelay: "340ms" }}
-              >
-                {current.github && (
-                  <a
-                    href={current.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-                  >
-                    <span className="h-3.5 w-3.5">
-                      <img
-                        src="/logos/github.png"
-                        alt="GitHub"
-                        className="h-full w-full object-contain invert"
-                      />
-                    </span>
-                    <span className="tracking-[0.12em] uppercase">
-                      View Code
-                    </span>
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="h-3 w-3"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M8 16l8-8M10 8h6v6"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </a>
-                )}
+            {/* Code / FDR / Polysat buttons */}
+{(current.github || current.fdr || current.polysat_website) && (
+  <div
+    className={[
+      "pt-2 flex flex-wrap gap-2 transform-gpu transition-all duration-400 ease-out",
+      detailPhase === "visible"
+        ? "opacity-100 translate-y-0"
+        : "opacity-0 translate-y-3",
+    ].join(" ")}
+    style={{ transitionDelay: "340ms" }}
+  >
+    {current.github && (
+      <a
+        href={current.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+      >
+        <span className="h-3.5 w-3.5">
+          <img
+            src="/logos/github.png"
+            alt="GitHub"
+            className="h-full w-full object-contain invert"
+          />
+        </span>
+        <span className="tracking-[0.12em] uppercase">Github</span>
+        <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+          <path
+            d="M8 16l8-8M10 8h6v6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </a>
+    )}
 
-                {current.fdr && (
-                  <a
-                    href={current.fdr}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-                  >
-                    <span className="h-3.5 w-3.5 flex items-center justify-center">
-                      <span className="inline-block h-2.5 w-2.5 rounded-[3px] bg-slate-200" />
-                    </span>
-                    <span className="tracking-[0.12em] uppercase">
-                      Final Design Review
-                    </span>
-                    <svg
-                      viewBox="0 0 24 24"
-                      className="h-3 w-3"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M8 16l8-8M10 8h6v6"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </a>
-                )}
-              </div>
-            )}
+    {current.fdr && (
+      <a
+        href={current.fdr}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+      >
+        <span className="h-3.5 w-3.5 flex items-center justify-center">
+          <span className="inline-block h-2.5 w-2.5 rounded-[3px] bg-slate-200" />
+        </span>
+        <span className="tracking-[0.12em] uppercase">Final Design Review</span>
+        <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+          <path
+            d="M8 16l8-8M10 8h6v6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </a>
+    )}
+
+    {current.polysat_website && (
+      <a
+        href={current.polysat_website}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+      >
+        <span className="h-3.5 w-3.5 flex items-center justify-center">
+  <img
+    src="/logos/wednesday-frog.png"
+    alt="It's Wednesday my dudes"
+    className="h-3 w-3 object-contain"
+  />
+</span>
+
+        <span className="tracking-[0.12em] uppercase">Polysat Website</span>
+        <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+          <path
+            d="M8 16l8-8M10 8h6v6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </a>
+    )}
+  </div>
+)}
+
           </aside>
         </div>
       </section>
@@ -1039,39 +1033,21 @@ function ProjectDeepDive({ project }: { project: Project }) {
         </h2>
 
         <p className="text-[13px] leading-relaxed text-slate-300">
-          During my time at CubeSat, I worked on two major projects. One of them
-          was <span className="font-medium">AMDROHP</span>, an oscillating heat
-          pipe that&apos;s deployed with springs that also act as the tubes
-          which refrigerant is allowed to travel in. An oscillating heat pipe
-          has not been tested in space as of the time this is written, so
-          AMDROHP is one of a kind. I worked on the deployment mechanism, which
-          includes the placement and designs of the hinges with dampers, and the
-          barriers that hold and secure the radiators prior to deployment.
+        On the CubeSat team I contributed to two major systems: AMDROHP, a 3D printed oscillating heat pipe radiator,
+        and a deployable drag sail for deorbit. AMDROHP uses spring-driven panels that double as working-fluid channels, 
+        allowing the radiator to stow compactly and deploy on orbit; I focused on the deployment mechanism, including hinge placement,
+         damping elements, and features that mechanically secure the radiators prior to release. 
+         </p>
+         <p className="text-[13px] leading-relaxed text-slate-300">For the drag sail, I supported concept 
+         development and testing for a 1U configuration aimed at reducing deorbit time as part of space debris mitigation. In parallel, I 
+         designed a modular battery bracket that could scale pack capacity with different mission energy budgets.
+</p>
+         
+          <p className="text-[13px] leading-relaxed text-slate-300"> The work also exposed me 
+         to RF link testing and the operational stress of bringing up satellite radios, which showed me how sensitive flight systems are to 
+         integration and test discipline.
         </p>
 
-        <p className="text-[13px] leading-relaxed text-slate-300">
-          In addition, I contributed to the development and testing of a
-          deployable drag sail system for a 1U CubeSat. The drag sail was
-          designed to reduce satellite deorbit times, which are a potential
-          solution in space debris mitigation efforts. This work was part of
-          broader efforts to ensure the sustainability of future satellite
-          missions.
-        </p>
-
-        <p className="text-[13px] leading-relaxed text-slate-300">
-          I also worked on a mini project focused on battery packing for a
-          CubeSat, where I designed a modular bracket that could house batteries
-          and adjust its capacity based on the energy budget requirements.
-        </p>
-
-        <p className="text-[13px] leading-relaxed text-slate-300">
-          Through these projects, I also gained experience with radio
-          technology, which was perhaps the most stressful situations that
-          I&apos;ve ever been in. They are crucial for satellite communication
-          and control. This exposure allowed me to understand the challenges and
-          solutions involved in maintaining reliable communication with
-          satellites in orbit.
-        </p>
       </section>
     );
   }
@@ -1087,12 +1063,13 @@ function ProjectDeepDive({ project }: { project: Project }) {
           goal was to automatically detect and tag opponents as they entered the
           field of view. I built a pipeline that takes a thermal snapshot,
           processes it, then pushes the target location into a motor control
-          loop that drives the pan/tilt axes.
+          loop that drives the crosshair.
         </p>
         <p className="text-[13px] leading-relaxed text-slate-300">
-          Most of the work was in edge cases: filtering noisy readings, dealing
-          with partial occlusions, and making sure the mechanism never drove
+          Most of the work was in edge cases. Filtering noisy readings, dealing
+          with partial occlusions, making sure the mechanism never drove
           itself into a hard stop even when the sensor got confused.
+          There was a tactic that some teams tried utilizing that included using a hot object to confuse the thermal sensor, but we were able to overcome that by finding the hottest column, so evenly spread body heat outweighs the single hot pixel in the snapshot.  
         </p>
       </section>
     );
@@ -1105,17 +1082,17 @@ function ProjectDeepDive({ project }: { project: Project }) {
           Course Constraints & Chassis Decisions
         </h2>
         <p className="text-[13px] leading-relaxed text-slate-300">
-          The Robot Rodeo course packed stairs, tight turns, light switches, and
-          a rocking table into a 1/3-scale ship interior. That environment drove
-          almost every chassis choice: wheelbase, center of gravity, clearances,
-          and how the drivetrain handled transitions between flat ground and
-          stairs.
+          The Naval Surface Warfare Center’s Robot Rodeo course packed stairs, 
+          tight turns, light switches, and a rocking table into a 1/3-scale ship interior.
+          The competition’s goal is to reduce risk to sailors by validating robotic systems 
+          that can inspect confined shipboard environments and identify unsafe conditions before humans enter.
         </p>
         <p className="text-[13px] leading-relaxed text-slate-300">
-          I iterated through layouts in CAD, then validated with fast hardware
-          mockups to make sure the robot didn&apos;t bottom out or hang up on
-          stair lips. Balancing on the rocking platform forced us to think about
-          how the robot recovered when its contact patch shifted.
+          That mission drove nearly every chassis decision: wheelbase,
+          center of gravity, ground clearance, and how the drivetrain handled transitions 
+          between flat decks and stair edges. I iterated through layouts in CAD, then validated
+           them with fast hardware mockups to ensure the robot would not bottom out or hang up on stair lips.
+            Balancing on the rocking platform forced careful consideration of how the robot recovered as its contact patch shifted under dynamic motion.
         </p>
       </section>
     );
@@ -1129,36 +1106,37 @@ function ProjectDeepDive({ project }: { project: Project }) {
         </h2>
 
         <p className="text-[13px] leading-relaxed text-slate-300">
-          During my time in Baja, I was heavily involved in both designing and
-          manufacturing. One of my projects was a 3D-printed pedal which cut
-          down the maximum stress in half compared to the previous year&apos;s
-          pedal. This allowed the team to take more aggressive maneuvers and
-          improved reliability significantly.
+          On the Baja SAE team I split time between design and hands-on manufacturing.
+           I redesigned the driver pedal as a 3D-printed component, cutting peak stress by roughly half 
+           compared to the previous iteration and enabling more aggressive maneuvers without failures. 
+        
         </p>
 
         <p className="text-[13px] leading-relaxed text-slate-300">
-          Another project included rethinking the notoriously difficult tab
-          mounting problem when it comes to welding, since those tabs are always
-          at odd angles and locations. 3D printing was once again the avenue I
-          resorted to, building fixtures that made it much easier to locate and
-          hold tabs consistently during welding.
+            To address the recurring problem of welding small tabs at odd angles on the frame, I developed 
+           3D-printed fixturing that located parts consistently and sped up fabrication. 
         </p>
 
-        <p className="text-[13px] leading-relaxed text-slate-300">
-          In addition to design work, I helped develop a method to determine the
-          moment of inertia of our tires. This testing procedure allowed us to
-          gather data that was used for both manual calculations and computer
-          simulations, which helped with accuracy in our performance assessments
-          and design improvements.
-        </p>
+<p className="text-[13px] leading-relaxed text-slate-300">
 
-        <p className="text-[13px] leading-relaxed text-slate-300">
-          A large portion of my hands-on experience in manual machining came
-          from Baja. I spent hundreds of hours creating parts using lathes and
-          mills. This gave me a lot of practical knowledge and expanded my
-          skills in designing for manufacturing, since I was constantly bouncing
-          between CAD and the realities of how parts actually get made.
-        </p>
+            I also helped define a
+            test method for tire moment of inertia so that the team had measured data for both hand calculations 
+            and simulations. 
+</p>
+<p className="text-[13px] leading-relaxed text-slate-300">
+            Most of my machining experience came from this car: spending hundreds of hours on lathes and mills 
+            shaped how I think about tolerances, set-ups, and how design choices translate into actual manufacturing effort.
+
+</p>
+
+
+
+
+<p className="text-[13px] leading-relaxed text-slate-300">
+
+
+
+</p>
       </section>
     );
   }
