@@ -36,7 +36,6 @@ const PROJECTS: Project[] = [
       "/projects/nerf-turret-main.jpg",
       "/projects/nerf-turret-side.jpg",
       "/projects/nerf-turret-thermal.jpg",
-      // 🎥 Google Drive videos – in the order you want them
       "https://drive.google.com/file/d/1898FJT0jIi6c01ILZBM89t2987Pqvz_G/preview",
       "https://drive.google.com/file/d/1l8kSO0vYaUGgQLaVvaD6BNZ9J0VO4BSx/preview",
       "https://drive.google.com/file/d/1mLuf-DcBSHBue66RncZfcMSVJwaqkHj2/preview",
@@ -170,23 +169,23 @@ const PROJECTS: Project[] = [
   },
 
   {
-    id: "hardware-lab",
-    title: "Hardware Lab Setup",
-    accent: "#4ade80",
-    role: "Lab • Instrumentation",
-    year: "2024",
-    summary:
-      "Bench setup with scopes, supplies, CAN tools, and PCBs optimized for fast bring-up and debug of physical systems.",
-    image: "/projects/hardware-lab.jpg",
-    tech: ["Lab tooling", "Instrumentation"],
-    highlights: [
-      "Bench organized around fast bring-up and minimal recabling.",
-      "Scopes, supplies, CAN tools, and boards laid out for quick iteration.",
-    ],
-    abstractTitle: "Bench Workflow",
-    abstract:
-      "The lab layout is optimized around debug speed rather than storage density. Scopes, power supplies, CAN tools, and boards are arranged so that most experiments can be set up by moving probes and cables a short distance instead of rethreading the entire bench. The goal is to reduce setup friction, keep common test paths semi-permanent, and spend the majority of time on actual troubleshooting and characterization rather than rewiring. That layout directly influences how quickly hardware ideas can go from sketch to measured behavior.",
-  },
+  id: "drawings",
+  title: "Drawings",
+  accent: "#a78bfa",
+  role: "Traditional • Digital",
+  year: "Ongoing",
+  summary: "A selection of my drawings.",
+  image: "/drawings/cover.jpg",
+  gallery: [
+    "/drawings/01.jpg",
+    "/drawings/02.jpg",
+    "/drawings/03.jpg",
+    "/drawings/04.jpg",
+    "/drawings/05.jpg",
+    "/drawings/06.jpg",
+  ],
+}
+
 ];
 
 export default function Home() {
@@ -702,21 +701,28 @@ function ProjectsCoverflow() {
       </section>
 
       {/* DETAILS SECTION (images + sticky aside) */}
-      <section className="mt-10 pb-10 mx-auto w-full max-w-5xl">
-        <div
-          key={current.id}
-          className="grid gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] items-start"
-        >
-          {/* LEFT: gallery, staggered cards */}
-          <div className="space-y-6">
-            {(() => {
-              const filtered =
-                current.gallery?.filter((media) => media !== current.image) ||
-                [];
-              const mediaToShow =
-                filtered.length > 0 ? filtered : [current.image];
+<section className="mt-10 pb-10 mx-auto w-full max-w-5xl">
+  <div
+    key={current.id}
+    className={[
+      "grid gap-10 items-start",
+      current.id === "drawings"
+        ? "grid-cols-1" // ✅ drawings: full width, no empty right column
+        : "lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]", // ✅ others: original layout
+    ].join(" ")}
+  >
+    {/* LEFT: gallery */}
+    <div className={current.id === "drawings" ? "" : "space-y-6"}>
+      {current.id === "drawings" ? (
+        (() => {
+          const media =
+            current.gallery && current.gallery.length > 0
+              ? current.gallery
+              : [current.image];
 
-              return mediaToShow.map((src, idx) => {
+          return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {media.map((src, idx) => {
                 const isDriveVideo = src.includes("drive.google.com/file");
 
                 return (
@@ -725,32 +731,38 @@ function ProjectsCoverflow() {
                     type="button"
                     onClick={() => openLightbox(src)}
                     className={[
-                      "group relative block overflow-hidden rounded-2xl bg-slate-950/70 border border-slate-800/60",
+                      "group relative w-full overflow-hidden rounded-2xl",
+                      "bg-slate-950/70 border border-slate-800/60",
                       "transform-gpu transition-all duration-500 ease-out",
                       detailPhase === "visible"
                         ? "opacity-100 translate-y-0"
                         : "opacity-0 translate-y-4",
                       "cursor-zoom-in",
+                      // ✅ stagger effect: every other tile bumps down on sm+
+                      idx % 2 === 1 ? "sm:translate-y-6" : "",
                     ].join(" ")}
                     style={{
-                      boxShadow: `0 0 55px ${current.accent}20`,
-                      transitionDelay: `${120 + idx * 80}ms`,
+                      boxShadow: `0 0 70px ${current.accent}22`,
+                      transitionDelay: `${120 + idx * 70}ms`,
                     }}
                   >
-                    {isDriveVideo ? (
-                      <iframe
-                        src={src}
-                        className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[460px] rounded-xl"
-                        allow="autoplay; encrypted-media"
-                        allowFullScreen
-                      />
-                    ) : (
-                      <img
-                        src={src}
-                        alt={`${current.title} view ${idx + 1}`}
-                        className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[460px] object-cover transition-transform duration-200 group-hover:scale-[1.02]"
-                      />
-                    )}
+                    {/* ✅ BIG SQUARE TILE */}
+                    <div className="aspect-square w-full">
+                      {isDriveVideo ? (
+                        <iframe
+                          src={src}
+                          className="h-full w-full"
+                          allow="autoplay; encrypted-media"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <img
+                          src={src}
+                          alt={`${current.title} ${idx + 1}`}
+                          className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+                        />
+                      )}
+                    </div>
 
                     {/* bottom gradient overlay */}
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
@@ -772,197 +784,270 @@ function ProjectsCoverflow() {
                     )}
                   </button>
                 );
-              });
-            })()}
-          </div>
-
-          {/* RIGHT: compact info panel (sticky) */}
-          <aside className="sticky top-24 space-y-5 text-sm">
-            {/* Title / summary */}
-            <div
-              className={[
-                "space-y-1 transform-gpu transition-all duration-400 ease-out",
-                detailPhase === "visible"
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-3",
-              ].join(" ")}
-              style={{ transitionDelay: "140ms" }}
-            >
-              <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
-                {current.role} • {current.year}
-              </div>
-              <h3 className="text-lg font-semibold text-slate-100">
-                {current.title}
-              </h3>
-              <p className="mt-1 text-[13px] leading-relaxed text-slate-300">
-                {current.summary}
-              </p>
+              })}
             </div>
+          );
+        })()
+      ) : (
+        // ===== NORMAL PROJECTS: your original left gallery (unchanged) =====
+        (() => {
+          const filtered =
+            current.gallery?.filter((media) => media !== current.image) || [];
+          const mediaToShow = filtered.length > 0 ? filtered : [current.image];
 
-            {/* Highlights */}
-            {current.highlights && current.highlights.length > 0 && (
-              <div
+          return mediaToShow.map((src, idx) => {
+            const isDriveVideo = src.includes("drive.google.com/file");
+
+            return (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => openLightbox(src)}
                 className={[
-                  "space-y-2 transform-gpu transition-all duration-400 ease-out",
+                  "group relative block overflow-hidden rounded-2xl bg-slate-950/70 border border-slate-800/60",
+                  "transform-gpu transition-all duration-500 ease-out",
                   detailPhase === "visible"
                     ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-3",
+                    : "opacity-0 translate-y-4",
+                  "cursor-zoom-in",
                 ].join(" ")}
-                style={{ transitionDelay: "220ms" }}
+                style={{
+                  boxShadow: `0 0 55px ${current.accent}20`,
+                  transitionDelay: `${120 + idx * 80}ms`,
+                }}
               >
-                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                  Highlights
-                </div>
-                <ul className="space-y-1.5 text-[13px] text-slate-300">
-                  {current.highlights.map((h, idx) => (
-                    <li key={idx} className="flex gap-2">
-                      <span
-                        className="mt-[6px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"
-                        style={{ backgroundColor: current.accent }}
-                      />
-                      <span>{h}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                {isDriveVideo ? (
+                  <iframe
+                    src={src}
+                    className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[460px] rounded-xl"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                  />
+                ) : (
+                  <img
+                    src={src}
+                    alt={`${current.title} view ${idx + 1}`}
+                    className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[460px] object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+                  />
+                )}
+
+                {/* bottom gradient overlay */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
+
+                {/* Play icon overlay for videos */}
+                {isDriveVideo && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-8 w-8 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                )}
+              </button>
+            );
+          });
+        })()
+      )}
+    </div>
+
+    {/* RIGHT: compact info panel (sticky) — HIDE ONLY for drawings */}
+    {current.id !== "drawings" && (
+      <aside className="sticky top-24 space-y-5 text-sm">
+        {/* Title / summary */}
+        <div
+          className={[
+            "space-y-1 transform-gpu transition-all duration-400 ease-out",
+            detailPhase === "visible"
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-3",
+          ].join(" ")}
+          style={{ transitionDelay: "140ms" }}
+        >
+          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+            {current.role} • {current.year}
+          </div>
+          <h3 className="text-lg font-semibold text-slate-100">
+            {current.title}
+          </h3>
+          <p className="mt-1 text-[13px] leading-relaxed text-slate-300">
+            {current.summary}
+          </p>
+        </div>
+
+        {/* Highlights */}
+        {current.highlights && current.highlights.length > 0 && (
+          <div
+            className={[
+              "space-y-2 transform-gpu transition-all duration-400 ease-out",
+              detailPhase === "visible"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-3",
+            ].join(" ")}
+            style={{ transitionDelay: "220ms" }}
+          >
+            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              Highlights
+            </div>
+            <ul className="space-y-1.5 text-[13px] text-slate-300">
+              {current.highlights.map((h, idx) => (
+                <li key={idx} className="flex gap-2">
+                  <span
+                    className="mt-[6px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: current.accent }}
+                  />
+                  <span>{h}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Tech tags */}
+        {current.tech && current.tech.length > 0 && (
+          <div
+            className={[
+              "space-y-2 pt-1 transform-gpu transition-all duration-400 ease-out",
+              detailPhase === "visible"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-3",
+            ].join(" ")}
+            style={{ transitionDelay: "280ms" }}
+          >
+            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+              Stack / Tools
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {current.tech.map((t, idx) => (
+                <span
+                  key={idx}
+                  className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[11px] text-slate-200"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Code / FDR / Polysat buttons */}
+        {(current.github || current.fdr || current.polysat_website) && (
+          <div
+            className={[
+              "pt-2 flex flex-wrap gap-2 transform-gpu transition-all duration-400 ease-out",
+              detailPhase === "visible"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-3",
+            ].join(" ")}
+            style={{ transitionDelay: "340ms" }}
+          >
+            {current.github && (
+              <a
+                href={current.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+              >
+                <span className="h-3.5 w-3.5">
+                  <img
+                    src="/logos/github.png"
+                    alt="GitHub"
+                    className="h-full w-full object-contain invert"
+                  />
+                </span>
+                <span className="tracking-[0.12em] uppercase">Github</span>
+                <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+                  <path
+                    d="M8 16l8-8M10 8h6v6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
             )}
 
-            {/* Tech tags */}
-            {current.tech && current.tech.length > 0 && (
-              <div
-                className={[
-                  "space-y-2 pt-1 transform-gpu transition-all duration-400 ease-out",
-                  detailPhase === "visible"
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-3",
-                ].join(" ")}
-                style={{ transitionDelay: "280ms" }}
+            {current.fdr && (
+              <a
+                href={current.fdr}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
               >
-                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-                  Stack / Tools
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {current.tech.map((t, idx) => (
-                    <span
-                      key={idx}
-                      className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[11px] text-slate-200"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
+                <span className="h-3.5 w-3.5 flex items-center justify-center">
+                  <span className="inline-block h-2.5 w-2.5 rounded-[3px] bg-slate-200" />
+                </span>
+                <span className="tracking-[0.12em] uppercase">
+                  Final Design Review
+                </span>
+                <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+                  <path
+                    d="M8 16l8-8M10 8h6v6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
             )}
 
-            {/* Code / FDR / Polysat buttons */}
-{(current.github || current.fdr || current.polysat_website) && (
-  <div
-    className={[
-      "pt-2 flex flex-wrap gap-2 transform-gpu transition-all duration-400 ease-out",
-      detailPhase === "visible"
-        ? "opacity-100 translate-y-0"
-        : "opacity-0 translate-y-3",
-    ].join(" ")}
-    style={{ transitionDelay: "340ms" }}
-  >
-    {current.github && (
-      <a
-        href={current.github}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-      >
-        <span className="h-3.5 w-3.5">
-          <img
-            src="/logos/github.png"
-            alt="GitHub"
-            className="h-full w-full object-contain invert"
-          />
-        </span>
-        <span className="tracking-[0.12em] uppercase">Github</span>
-        <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
-          <path
-            d="M8 16l8-8M10 8h6v6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </a>
-    )}
+            {current.polysat_website && (
+              <a
+                href={current.polysat_website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+              >
+                <span className="h-3.5 w-3.5 flex items-center justify-center">
+                  <img
+                    src="/logos/wednesday-frog.png"
+                    alt="It's Wednesday my dudes"
+                    className="h-3 w-3 object-contain"
+                  />
+                </span>
 
-    {current.fdr && (
-      <a
-        href={current.fdr}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-      >
-        <span className="h-3.5 w-3.5 flex items-center justify-center">
-          <span className="inline-block h-2.5 w-2.5 rounded-[3px] bg-slate-200" />
-        </span>
-        <span className="tracking-[0.12em] uppercase">Final Design Review</span>
-        <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
-          <path
-            d="M8 16l8-8M10 8h6v6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </a>
-    )}
-
-    {current.polysat_website && (
-      <a
-        href={current.polysat_website}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-      >
-        <span className="h-3.5 w-3.5 flex items-center justify-center">
-  <img
-    src="/logos/wednesday-frog.png"
-    alt="It's Wednesday my dudes"
-    className="h-3 w-3 object-contain"
-  />
-</span>
-
-        <span className="tracking-[0.12em] uppercase">Polysat Website</span>
-        <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
-          <path
-            d="M8 16l8-8M10 8h6v6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </a>
+                <span className="tracking-[0.12em] uppercase">Polysat Website</span>
+                <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+                  <path
+                    d="M8 16l8-8M10 8h6v6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
+            )}
+          </div>
+        )}
+      </aside>
     )}
   </div>
+</section>
+
+{/* FULL-WIDTH DEEP DIVE, BELOW ALL PHOTOS */}
+<ProjectDeepDive project={current} />
+
+{/* LIGHTBOX OVERLAY WITH ZOOM ANIMATION + DRIVE SUPPORT */}
+{lightboxSrc && (
+  <Lightbox
+    src={lightboxSrc}
+    zoomed={lightboxZoomed}
+    onClose={closeLightbox}
+  />
 )}
 
-          </aside>
-        </div>
-      </section>
 
-      {/* FULL-WIDTH DEEP DIVE, BELOW ALL PHOTOS */}
-      <ProjectDeepDive project={current} />
-
-      {/* LIGHTBOX OVERLAY WITH ZOOM ANIMATION + DRIVE SUPPORT */}
-      {lightboxSrc && (
-        <Lightbox
-          src={lightboxSrc}
-          zoomed={lightboxZoomed}
-          onClose={closeLightbox}
-        />
-      )}
     </>
   );
 }
