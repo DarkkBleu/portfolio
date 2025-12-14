@@ -596,11 +596,11 @@ useEffect(() => {
   <div
     className="absolute -inset-[40%]"
     style={{
-      top: "-10%", // ⬆ move dots upward (adjustable)
+      top: "-70%", // ⬆ move dots upward (adjustable)
       backgroundImage:
         "radial-gradient(circle, rgba(148,163,184,0.38) 1px, transparent 1px)",
       backgroundSize: "32px 32px",
-      opacity: 0.7,
+      opacity: 0.9,
     }}
   />
 
@@ -814,22 +814,36 @@ useEffect(() => {
               {/* Masonry columns */}
               <div className="columns-1 sm:columns-2 gap-6">
                 {media.map((src, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => openLightbox(src)}
-                    className="group relative w-full mb-6 break-inside-avoid overflow-hidden rounded-2xl bg-slate-950/70 border border-slate-800/60 cursor-zoom-in"
-                    style={{ boxShadow: `0 0 70px ${current.accent}22` }}
-                  >
-                    <img
-                      src={src}
-                      alt={`Drawing ${idx + 1}`}
-                      className="w-full h-auto max-h-[70vh] object-contain bg-black/20"
-                      loading="lazy"
-                    />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/55 to-transparent" />
-                  </button>
-                ))}
+  <button
+    key={idx}
+    type="button"
+    onClick={() => openLightbox(src)}
+    className={[
+      "group relative w-full mb-6 break-inside-avoid overflow-hidden rounded-2xl",
+      "bg-slate-950/70 border border-slate-800/60 cursor-zoom-in",
+      "transform-gpu transition-all duration-500 ease-out",
+      detailPhase === "visible"
+        ? "opacity-100 translate-y-0"
+        : "opacity-0 translate-y-4",
+    ].join(" ")}
+    style={{
+      boxShadow: `0 0 70px ${current.accent}22`,
+      transitionDelay: `${120 + idx * 70}ms`,
+    }}
+  >
+    {/* If you want videos later, we can detect mp4 here.
+        For now keep images/gifs as <img> */}
+    <img
+      src={src}
+      alt={`Artwork ${idx + 1}`}
+      className="w-full h-auto max-h-[70vh] object-contain bg-black/20"
+      loading="lazy"
+    />
+
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/55 to-transparent" />
+  </button>
+))}
+
               </div>
             </div>
           );
