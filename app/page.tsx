@@ -14,6 +14,7 @@ type Project = {
   github?: string;
   fdr?: string; // final design review / PDF link
   polysat_website?: string; //polysat website lol
+  paper?: string;
   gallery?: string[]; // extra images for the detail section
   highlights?: string[]; // SHORT bullets for sticky panel
   tech?: string[]; // tech stack / tools
@@ -49,6 +50,32 @@ const PROJECTS: Project[] = [
     ],
     abstractTitle: "Control Loop & Competition Context",
     },
+
+
+
+{
+    id: "rivian",
+    title: "Rivian",
+    accent: "#d6b24a",
+    role: "CAPL • Python • Cpp • MATLAB",
+    year: "2025",
+    summary:
+      "Mechatronics Hardware Validation Engineer @ Rivian.",
+    image: "/projects/rivian-main.jpg",
+    gallery: [
+      "/projects/rivian-main.jpg",
+      "/projects/rivian-01.jpg",
+    ],
+    highlights: [
+      "Validated subsystems using part-representative fixtures.",
+      "Used sensors, DAQ systems, and vehicle networks to capture hardware behavior.",
+      "Created tools that improved validation efficiency.",
+    ],
+    abstractTitle: "Logging Architecture",
+  },
+
+
+
 
   {
     id: "robot-rodeo",
@@ -89,10 +116,10 @@ const PROJECTS: Project[] = [
     polysat_website: "https://www.polysat.org/in-development",
     gallery: [
       "/projects/cubesat-main.jpg",
+      "/projects/battery.gif",
       "/projects/cubesat-amdrohp.jpg",
       "/projects/cubesat-drag-sail.jpg",
       "/projects/cubesat-battery-pack.jpg",
-      "https://drive.google.com/file/d/1beix8_-4QKVdmhAQNja72RonBiP-tqxd/preview",
     ],
     
     highlights: [
@@ -106,8 +133,8 @@ const PROJECTS: Project[] = [
 
   {
     id: "baja",
-    title: "Baja SAE Design & Manufacturing",
-    accent: "#fbbf24",
+    title: "Baja SAE",
+    accent: "#b14159",
     role: "matlab",
     year: "2021-2023",
     summary:
@@ -130,47 +157,36 @@ const PROJECTS: Project[] = [
       "On the Baja SAE team I split time between design and hands-on manufacturing. I redesigned the driver pedal as a 3D-printed component, cutting peak stress by roughly half compared to the previous iteration and enabling more aggressive maneuvers without failures. To address the recurring problem of welding small tabs at odd angles on the frame, I developed 3D-printed fixturing that located parts consistently and sped up fabrication. I also helped define a test method for tire moment of inertia so that the team had measured data for both hand calculations and simulations. Most of my machining experience came from this car: spending hundreds of hours on lathes and mills shaped how I think about tolerances, set-ups, and how design choices translate into actual manufacturing effort.",
   },
 
-  {
-    id: "sensor-logger",
-    title: "Sensor Data Logger",
-    accent: "#fb7185",
-    role: "Embedded • Logging",
-    year: "2023",
-    summary:
-      "Multi-channel sensor logger for capturing real-world signals and replaying them into analysis scripts.",
-    image: "/projects/sensor-logger.jpg",
-    tech: ["Embedded", "SD logging"],
-    highlights: [
-      "Captures multi-channel data with stable timestamps to SD.",
-      "Designed around clean shutdown and log recovery after power loss.",
-    ],
-    abstractTitle: "Logging Architecture",
-    abstract:
-      "This sensor logger was built to capture multi-channel signals from real hardware and replay those traces into offline analysis scripts. The design emphasized timestamp stability and log integrity rather than UI, with a focus on how sample timing propagates into downstream control and estimation algorithms. The firmware and file format were structured so that logs would remain recoverable even if power was pulled mid-run, minimizing the amount of data lost to unexpected resets and making the tool useful for long-duration or failure-prone tests.",
-  },
+  
 
   {
-    id: "portfolio",
-    title: "Portfolio Surface",
-    accent: "#eab308",
-    role: "UX • Frontend",
-    year: "2025",
+    id: "center",
+    title: "Center for Centering",
+    accent: "#a4c94e",
+    role: "CNC",
+    year: "2023",
     summary:
-      "Next.js portfolio with interactive skill band and project coverflow, tuned to feel like a hardware UI.",
-    image: "/projects/portfolio.jpg",
-    tech: ["Next.js", "React", "Tailwind"],
-    highlights: [
-      "Built the skill band, coverflow, and detail views in React/Next.js.",
-      "Motion and opacity tuned to feel like a hardware-status UI, not a blog.",
+      "Architectural structure meant for mediation.",
+    image: "/projects/center-main.jpg",
+    paper: "https://digitalcommons.calpoly.edu/arcesp/199/",
+
+     gallery: [
+      "/projects/center-01.jpg",
+      "/projects/center-02.jpg",
+      "/projects/center-03.jpg",
+      "/projects/center-04.jpg",
     ],
-    abstractTitle: "Interaction & Visual Language",
-    abstract:
-      "This site doubles as a design project. The scrolling skill band, coverflow hero, and cursor-reactive grid are tuned to feel like a hardware UI rather than a marketing page. Most of the effort went into motion curves, opacity ramps, and layout choices that keep the interface readable while still conveying that the owner works on physical systems. The result is a portfolio surface that behaves more like an instrument cluster for projects than a traditional scroll-down résumé.",
+    highlights: [
+      "Custom geometric modular pavilion design.",
+      "Helped design & assemble a full-scale dome.",
+      "Real deadline and client-driven build process.",
+    ],
+    abstractTitle: "Visual Language",
   },
 
   {
   id: "drawings",
-  title: "Drawings",
+  title: "Art",
   accent: "#a78bfa",
   role: "Traditional • Digital",
   year: "Ongoing",
@@ -183,6 +199,12 @@ const PROJECTS: Project[] = [
     "/drawings/04.jpg",
     "/drawings/05.jpg",
     "/drawings/06.jpg",
+    "/drawings/07.jpg",
+    "/drawings/08.jpg",
+    "/drawings/09.jpg",
+    "/drawings/10.jpg",
+    "/drawings/poolball.gif",
+
   ],
 }
 
@@ -428,6 +450,15 @@ function SkillItem({ logo, label }: { logo: string; label: string }) {
    PROJECTS COVERFLOW + DETAILS
 ================================*/
 function ProjectsCoverflow() {
+
+const rivianTitleRef = useRef<HTMLHeadingElement | null>(null);
+const [rivianSheen, setRivianSheen] = useState(false);
+const rivianSheenTimeout = useRef<number | null>(null);
+
+const [sheenOffset, setSheenOffset] = useState(0);
+const lastScrollY = useRef(0);
+
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const current = PROJECTS[currentIndex];
   const [detailPhase, setDetailPhase] =
@@ -463,6 +494,52 @@ function ProjectsCoverflow() {
         : (prev + 1) % PROJECTS.length
     );
   };
+useEffect(() => {
+  if (current.id !== "rivian") return;
+
+  const el = rivianTitleRef.current;
+  if (!el) return;
+
+  let raf = 0;
+
+  const update = () => {
+    raf = 0;
+    const rect = el.getBoundingClientRect();
+
+    // When the title is around the center of the viewport -> max sheen
+    const vh = window.innerHeight || 1;
+    const center = rect.top + rect.height / 2;
+
+    // progress: 0 at top, 1 at bottom (clamped)
+    let p = center / vh;
+    if (p < 0) p = 0;
+    if (p > 1) p = 1;
+
+    // Map p to a wider range so it "travels" nicely
+    // 0..1 -> -40..140 (percent)
+    const pos = -40 + p * 180;
+
+    el.style.setProperty("--sheen", `${pos}%`);
+  };
+
+  const onScroll = () => {
+    if (raf) return;
+    raf = requestAnimationFrame(update);
+  };
+
+  // initial
+  update();
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+
+  return () => {
+    window.removeEventListener("scroll", onScroll);
+    window.removeEventListener("resize", onScroll);
+    if (raf) cancelAnimationFrame(raf);
+  };
+}, [current.id]);
+
 
   // Arrow keys left/right
   useEffect(() => {
@@ -700,15 +777,15 @@ function ProjectsCoverflow() {
         </div>
       </section>
 
-      {/* DETAILS SECTION (images + sticky aside) */}
+{/* DETAILS SECTION (images + sticky aside) */}
 <section className="mt-10 pb-10 mx-auto w-full max-w-5xl">
   <div
     key={current.id}
     className={[
       "grid gap-10 items-start",
       current.id === "drawings"
-        ? "grid-cols-1" // ✅ drawings: full width, no empty right column
-        : "lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]", // ✅ others: original layout
+        ? "grid-cols-1"
+        : "lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]",
     ].join(" ")}
   >
     {/* LEFT: gallery */}
@@ -721,75 +798,43 @@ function ProjectsCoverflow() {
               : [current.image];
 
           return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {media.map((src, idx) => {
-                const isDriveVideo = src.includes("drive.google.com/file");
+            <div>
+              {/* Title (stronger) */}
+              <div className="mb-6 flex items-center gap-3">
+                <div
+                  className="h-[1px] w-10"
+                  style={{ backgroundColor: `${current.accent}80` }}
+                />
+                <div className="text-sm font-semibold tracking-[0.18em] uppercase text-slate-200">
+                  Artwork
+                </div>
+                <div className="flex-1 h-[1px] bg-slate-800/70" />
+              </div>
 
-                return (
+              {/* Masonry columns */}
+              <div className="columns-1 sm:columns-2 gap-6">
+                {media.map((src, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => openLightbox(src)}
-                    className={[
-                      "group relative w-full overflow-hidden rounded-2xl",
-                      "bg-slate-950/70 border border-slate-800/60",
-                      "transform-gpu transition-all duration-500 ease-out",
-                      detailPhase === "visible"
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-4",
-                      "cursor-zoom-in",
-                      // ✅ stagger effect: every other tile bumps down on sm+
-                      idx % 2 === 1 ? "sm:translate-y-6" : "",
-                    ].join(" ")}
-                    style={{
-                      boxShadow: `0 0 70px ${current.accent}22`,
-                      transitionDelay: `${120 + idx * 70}ms`,
-                    }}
+                    className="group relative w-full mb-6 break-inside-avoid overflow-hidden rounded-2xl bg-slate-950/70 border border-slate-800/60 cursor-zoom-in"
+                    style={{ boxShadow: `0 0 70px ${current.accent}22` }}
                   >
-                    {/* ✅ BIG SQUARE TILE */}
-                    <div className="aspect-square w-full">
-                      {isDriveVideo ? (
-                        <iframe
-                          src={src}
-                          className="h-full w-full"
-                          allow="autoplay; encrypted-media"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <img
-                          src={src}
-                          alt={`${current.title} ${idx + 1}`}
-                          className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
-                        />
-                      )}
-                    </div>
-
-                    {/* bottom gradient overlay */}
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
-
-                    {/* Play icon overlay for videos */}
-                    {isDriveVideo && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-8 w-8 text-white"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        </div>
-                      </div>
-                    )}
+                    <img
+                      src={src}
+                      alt={`Drawing ${idx + 1}`}
+                      className="w-full h-auto max-h-[70vh] object-contain bg-black/20"
+                      loading="lazy"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/55 to-transparent" />
                   </button>
-                );
-              })}
+                ))}
+              </div>
             </div>
           );
         })()
       ) : (
-        // ===== NORMAL PROJECTS: your original left gallery (unchanged) =====
         (() => {
           const filtered =
             current.gallery?.filter((media) => media !== current.image) || [];
@@ -831,10 +876,8 @@ function ProjectsCoverflow() {
                   />
                 )}
 
-                {/* bottom gradient overlay */}
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
 
-                {/* Play icon overlay for videos */}
                 {isDriveVideo && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
@@ -856,10 +899,9 @@ function ProjectsCoverflow() {
       )}
     </div>
 
-    {/* RIGHT: compact info panel (sticky) — HIDE ONLY for drawings */}
+    {/* RIGHT: sticky panel — only for non-drawings */}
     {current.id !== "drawings" && (
       <aside className="sticky top-24 space-y-5 text-sm">
-        {/* Title / summary */}
         <div
           className={[
             "space-y-1 transform-gpu transition-all duration-400 ease-out",
@@ -872,15 +914,24 @@ function ProjectsCoverflow() {
           <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
             {current.role} • {current.year}
           </div>
-          <h3 className="text-lg font-semibold text-slate-100">
-            {current.title}
-          </h3>
+
+          
+         <h3
+  ref={current.id === "rivian" ? rivianTitleRef : null}
+  className={[
+    "text-lg font-semibold",
+    current.id === "rivian" ? "rivian-gold" : "text-slate-100",
+  ].join(" ")}
+>
+  {current.title}
+</h3>
+
+
           <p className="mt-1 text-[13px] leading-relaxed text-slate-300">
             {current.summary}
           </p>
         </div>
 
-        {/* Highlights */}
         {current.highlights && current.highlights.length > 0 && (
           <div
             className={[
@@ -907,8 +958,124 @@ function ProjectsCoverflow() {
             </ul>
           </div>
         )}
+{/* BUTTONS */}
+<div
+  className={[
+    "pt-2 flex flex-wrap gap-2 transform-gpu transition-all duration-400 ease-out",
+    detailPhase === "visible"
+      ? "opacity-100 translate-y-0"
+      : "opacity-0 translate-y-3",
+  ].join(" ")}
+  style={{ transitionDelay: "340ms" }}
+>
+  {/* GitHub */}
+  {current.github ? (
+    <a
+      href={current.github}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+    >
+      <span className="h-3.5 w-3.5">
+        <img
+          src="/logos/github.png"
+          alt="GitHub"
+          className="h-full w-full object-contain invert"
+        />
+      </span>
+      <span className="tracking-[0.12em] uppercase">Github</span>
+      <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+        <path
+          d="M8 16l8-8M10 8h6v6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </a>
+  ) : null}
 
-        {/* Tech tags */}
+  {/* Final Design Review */}
+  {current.fdr ? (
+    <a
+      href={current.fdr}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+    >
+      <span className="h-3.5 w-3.5 flex items-center justify-center">
+        <span className="inline-block h-2.5 w-2.5 rounded-[3px] bg-slate-200" />
+      </span>
+      <span className="tracking-[0.12em] uppercase">Final Design Review</span>
+      <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+        <path
+          d="M8 16l8-8M10 8h6v6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </a>
+  ) : null}
+
+  {/* Polysat Website */}
+  {current.polysat_website ? (
+    <a
+      href={current.polysat_website}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+    >
+      <span className="h-3.5 w-3.5 flex items-center justify-center">
+        <img
+          src="/logos/wednesday-frog.png"
+          alt="Link"
+          className="h-3 w-3 object-contain"
+        />
+      </span>
+      <span className="tracking-[0.12em] uppercase">Website</span>
+      <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+        <path
+          d="M8 16l8-8M10 8h6v6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </a>
+  ) : null}
+  {current.paper && (
+  <a
+    href={current.paper}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+  >
+    <span className="h-3.5 w-3.5 flex items-center justify-center">
+      <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#d4af37]" />
+    </span>
+    <span className="tracking-[0.12em] uppercase">Publication</span>
+    <svg viewBox="0 0 24 24" className="h-3 w-3">
+      <path
+        d="M8 16l8-8M10 8h6v6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </a>
+)}
+
+</div>
+
         {current.tech && current.tech.length > 0 && (
           <div
             className={[
@@ -934,105 +1101,11 @@ function ProjectsCoverflow() {
             </div>
           </div>
         )}
-
-        {/* Code / FDR / Polysat buttons */}
-        {(current.github || current.fdr || current.polysat_website) && (
-          <div
-            className={[
-              "pt-2 flex flex-wrap gap-2 transform-gpu transition-all duration-400 ease-out",
-              detailPhase === "visible"
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-3",
-            ].join(" ")}
-            style={{ transitionDelay: "340ms" }}
-          >
-            {current.github && (
-              <a
-                href={current.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-              >
-                <span className="h-3.5 w-3.5">
-                  <img
-                    src="/logos/github.png"
-                    alt="GitHub"
-                    className="h-full w-full object-contain invert"
-                  />
-                </span>
-                <span className="tracking-[0.12em] uppercase">Github</span>
-                <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
-                  <path
-                    d="M8 16l8-8M10 8h6v6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </a>
-            )}
-
-            {current.fdr && (
-              <a
-                href={current.fdr}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-              >
-                <span className="h-3.5 w-3.5 flex items-center justify-center">
-                  <span className="inline-block h-2.5 w-2.5 rounded-[3px] bg-slate-200" />
-                </span>
-                <span className="tracking-[0.12em] uppercase">
-                  Final Design Review
-                </span>
-                <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
-                  <path
-                    d="M8 16l8-8M10 8h6v6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </a>
-            )}
-
-            {current.polysat_website && (
-              <a
-                href={current.polysat_website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-              >
-                <span className="h-3.5 w-3.5 flex items-center justify-center">
-                  <img
-                    src="/logos/wednesday-frog.png"
-                    alt="It's Wednesday my dudes"
-                    className="h-3 w-3 object-contain"
-                  />
-                </span>
-
-                <span className="tracking-[0.12em] uppercase">Polysat Website</span>
-                <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
-                  <path
-                    d="M8 16l8-8M10 8h6v6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </a>
-            )}
-          </div>
-        )}
       </aside>
     )}
   </div>
+
+  
 </section>
 
 {/* FULL-WIDTH DEEP DIVE, BELOW ALL PHOTOS */}
@@ -1226,33 +1299,66 @@ function ProjectDeepDive({ project }: { project: Project }) {
     );
   }
 
-  if (project.id === "sensor-logger") {
+  if (project.id === "rivian") {
     return (
       <section className="mt-10 border-t border-slate-800/70 pt-8 mx-auto w/full max-w-3xl space-y-3">
         <h2 className="text-sm font-semibold tracking-[0.22em] uppercase text-slate-400">
-          Logging Architecture
+          rivian
         </h2>
         <p className="text-[13px] leading-relaxed text-slate-300">
-          This logger was built so I could capture multi-channel signals from
-          real hardware, then replay them into analysis scripts. The focus was
-          on timestamp accuracy, log robustness, and being able to recover data
-          even if power was pulled mid-run.
+          My work focused on improving how complex electromechanical systems are validated, 
+          diagnosed, and supported throughout their lifecycle, from early testing through service. 
+          I worked primarily with physical test fixtures representing vehicle subsystems and used them to validate 
+          functional behavior, repeatability, and robustness under real-world conditions. Much of this work involved 
+          hands-on testing of motorized mechanisms, sensors, and integrated hardware, with an emphasis on understanding
+           how systems behave when exposed to variability rather than ideal conditions.
+</p>
+<p className="text-[13px] leading-relaxed text-slate-300">
+A recurring challenge in validation is that large, shared test setups can become bottlenecks. 
+While flexible, they are often slow to build, difficult to move, and prone to creating unnecessary coupling 
+between unrelated tests. I addressed this by building smaller, purpose-built tools and reduced-scope control setups 
+that were tailored to specific subsystems. These tools enabled tests to be separated, relocated, and run in parallel, 
+reducing schedule risk and improving overall test throughput. This approach made it easier to continue validation work even when other tests were blocked or resources were constrained.
+</p>
+<p className="text-[13px] leading-relaxed text-slate-300">
+I also designed and built numerous jigs and fixtures to support sensor testing and hardware validation. 
+These fixtures improved repeatability, reduced setup time, and allowed components to be swapped quickly during 
+debugging. Through this work, I gained experience integrating a wide range of sensors with data acquisition systems, 
+validating signal integrity, and troubleshooting cases where measurements did not align with expected behavior. 
+I regularly worked with vehicle communication interfaces during testing and supported diagnosis of issues that crossed
+ mechanical, electrical, and communication boundaries.
+</p>
+<p className="text-[13px] leading-relaxed text-slate-300">
+Beyond validation, I contributed to improving service-facing diagnostics by identifying cases where 
+components were being replaced without a clear determination that they were faulty. I developed simple, standalone 
+diagnostic tools that allowed subsystems to be exercised through repeatable test sequences and evaluated with a clear pass/fail result. 
+This reduced unnecessary part replacement, shortened service time, and improved confidence in repair decisions by replacing subjective 
+checks with consistent diagnostics.
+</p>
+<p className="text-[13px] leading-relaxed text-slate-300">
+Across all of this work, my focus was on building practical tools that saved time, reduced rework, and 
+lowered overall testing and service overhead. Rather than optimizing individual tests in isolation, I aimed 
+to improve the surrounding infrastructure so that validation could move faster, scale more effectively, and better 
+support downstream teams. The result was a more flexible, efficient validation workflow grounded in real hardware behavior and practical engineering judgment.
         </p>
       </section>
     );
   }
 
-  if (project.id === "portfolio") {
+  if (project.id === "center") {
     return (
       <section className="mt-10 border-t border-slate-800/70 pt-8 mx-auto w/full max-w-3xl space-y-3">
         <h2 className="text-sm font-semibold tracking-[0.22em] uppercase text-slate-400">
-          Interaction & Visual Language
+          Project Details
         </h2>
         <p className="text-[13px] leading-relaxed text-slate-300">
-          This site is also a design project: the scrolling skill band,
-          coverflow, and cursor-reactive grid are tuned to feel like a hardware
-          UI. Most of the work went into getting motion curves and opacity ramps
-          to feel smooth without hurting readability.
+          Center for Centering was a design-build senior project aimed at creating a large, 
+          modular pavilion that provides a calm, enclosed space while maintaining a connection to the outdoors. 
+          The team developed a custom geometric strategy to minimize parts and optimize assembly, modeling every component
+           digitally before fabricating them with CNC and traditional woodshop tools. Throughout the process, we confronted real 
+           fabrication and tolerance challenges, requiring iterative fitting and coordination between digital design and physical construction.
+            This project was client-driven, deadline-bound, and executed collaboratively with architecture students - giving hands-on experience 
+            in managing geometry, manufacturing constraints, and assembly sequencing from concept to finished structure.
         </p>
       </section>
     );
