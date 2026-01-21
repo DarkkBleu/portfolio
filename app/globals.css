@@ -55,3 +55,15 @@ body {
   /* <-- this is the whole trick */
   background-position: var(--sheen, 30%) 50%;
 }
+/* Jelly "pop" */
+@keyframes jellyPop {
+  0%   { transform: scaleX(1) scaleY(1); }
+  55%  { transform: scaleX(1.25) scaleY(1.05); }
+  75%  { transform: scaleX(0.95) scaleY(0.98); }
+  100% { transform: scaleX(1.12) scaleY(1.02); }
+}
+
+/* runs only on hover */
+.jelly:hover .jelly-inner {
+  animation: jellyPop 240ms cubic-bezier(.2,.9,.25,1) both;
+}

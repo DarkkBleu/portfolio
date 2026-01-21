@@ -308,7 +308,10 @@ function SkillBand() {
   }, []);
 
   useEffect(() => {
-    const baseSpeed = 0.08;
+    // speed scales with the row width so small screens don't feel slower
+const baseSpeed = Math.max(0.035, rowWidth * 0.00006);
+
+
     const friction = 0.92;
     const minVel = 0.02;
 
@@ -450,19 +453,27 @@ function SkillItem({ logo, label }: { logo: string; label: string }) {
    PROJECTS COVERFLOW + DETAILS
 ================================*/
 function ProjectsCoverflow() {
+  const [uiScale, setUiScale] = useState(1);
 
-const rivianTitleRef = useRef<HTMLHeadingElement | null>(null);
-const [rivianSheen, setRivianSheen] = useState(false);
-const rivianSheenTimeout = useRef<number | null>(null);
+useEffect(() => {
+  const update = () => {
+    if (window.innerWidth < 430) {
+      setUiScale(0.8); // small screen = zoom out
+    } else {
+      setUiScale(1); // normal screen
+    }
+  };
 
-const [sheenOffset, setSheenOffset] = useState(0);
-const lastScrollY = useRef(0);
+  update();
+  window.addEventListener("resize", update);
+  return () => window.removeEventListener("resize", update);
+}, []);
 
+  const rivianTitleRef = useRef<HTMLHeadingElement | null>(null);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const current = PROJECTS[currentIndex];
-  const [detailPhase, setDetailPhase] =
-    useState<"hidden" | "visible">("visible");
+  const [detailPhase, setDetailPhase] = useState<"hidden" | "visible">("visible");
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(
@@ -494,52 +505,47 @@ const lastScrollY = useRef(0);
         : (prev + 1) % PROJECTS.length
     );
   };
-useEffect(() => {
-  if (current.id !== "rivian") return;
 
-  const el = rivianTitleRef.current;
-  if (!el) return;
+  // Rivian gold shimmer scroll-based
+  useEffect(() => {
+    if (current.id !== "rivian") return;
 
-  let raf = 0;
+    const el = rivianTitleRef.current;
+    if (!el) return;
 
-  const update = () => {
-    raf = 0;
-    const rect = el.getBoundingClientRect();
+    let raf = 0;
 
-    // When the title is around the center of the viewport -> max sheen
-    const vh = window.innerHeight || 1;
-    const center = rect.top + rect.height / 2;
+    const update = () => {
+      raf = 0;
+      const rect = el.getBoundingClientRect();
 
-    // progress: 0 at top, 1 at bottom (clamped)
-    let p = center / vh;
-    if (p < 0) p = 0;
-    if (p > 1) p = 1;
+      const vh = window.innerHeight || 1;
+      const center = rect.top + rect.height / 2;
 
-    // Map p to a wider range so it "travels" nicely
-    // 0..1 -> -40..140 (percent)
-    const pos = -40 + p * 180;
+      let p = center / vh;
+      if (p < 0) p = 0;
+      if (p > 1) p = 1;
 
-    el.style.setProperty("--sheen", `${pos}%`);
-  };
+      const pos = -40 + p * 180;
+      el.style.setProperty("--sheen", `${pos}%`);
+    };
 
-  const onScroll = () => {
-    if (raf) return;
-    raf = requestAnimationFrame(update);
-  };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
 
-  // initial
-  update();
+    update();
 
-  window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
 
-  return () => {
-    window.removeEventListener("scroll", onScroll);
-    window.removeEventListener("resize", onScroll);
-    if (raf) cancelAnimationFrame(raf);
-  };
-}, [current.id]);
-
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [current.id]);
 
   // Arrow keys left/right
   useEffect(() => {
@@ -583,7 +589,9 @@ useEffect(() => {
   };
 
   return (
+  <div style={{ transform: `scale(${uiScale})`, transformOrigin: "top center" }}>
     <>
+
       {/* HERO COVERFLOW */}
       <section
         ref={sectionRef}
@@ -592,81 +600,34 @@ useEffect(() => {
         className="mt-8 relative"
       >
         {/* BACKGROUND: dot field, lifted higher */}
-<div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-  <div
-    className="absolute -inset-[40%]"
-    style={{
-      top: "-70%", // ⬆ move dots upward (adjustable)
-      backgroundImage:
-        "radial-gradient(circle, rgba(148,163,184,0.38) 1px, transparent 1px)",
-      backgroundSize: "32px 32px",
-      opacity: 0.9,
-    }}
-  />
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+          <div
+            className="absolute -inset-[40%]"
+            style={{
+              top: "-70%",
+              backgroundImage:
+                "radial-gradient(circle, rgba(148,163,184,0.38) 1px, transparent 1px)",
+              backgroundSize: "32px 32px",
+              opacity: 0.9,
+            }}
+          />
+        </div>
 
-</div>
-{/* SOFT VIGNETTE OVER DOTS */}
-<div
-  className="pointer-events-none absolute inset-0 z-10"
-  style={{
-    background:
-      "radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,1) 100%)",
-  }}
-/>
+        {/* SOFT VIGNETTE OVER DOTS */}
+        <div
+          className="pointer-events-none absolute inset-0 z-10"
+          style={{
+            background:
+              "radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.85) 78%, rgba(0,0,0,1) 100%)",
+          }}
+        />
 
         {/* FOREGROUND CONTENT */}
         <div className="relative z-30 mx-auto flex w-full max-w-6xl flex-col items-center gap-6 md:gap-8 py-8 md:py-10">
           {/* CAROUSEL AREA */}
-<div className="relative flex w-full items-center justify-center
-                h-[18rem] sm:h-[22rem] md:h-[26rem] lg:h-[30rem]">
-
+          <div className="relative flex w-full items-center justify-center h-[18rem] sm:h-[22rem] md:h-[26rem] lg:h-[30rem]">
             {/* CENTER GLOW */}
             <div className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-72 w-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(148,163,184,0.35),_transparent_70%)] blur-[90px]" />
-
-            {/* ARROWS */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-30 flex items-center justify-between">
-              <button
-                onClick={() => go("prev")}
-                className="pointer-events-auto ml-1 sm:ml-2 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-slate-700/30 bg-black/40 text-[10px] sm:text-[11px] text-slate-400 transition hover:border-slate-500/60 hover:bg-black/80 hover:text-slate-100"
-                aria-label="Previous project"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-3.5 w-3.5 sm:h-4 sm:w-4"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M14.5 6 8.5 12l6 6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              <button
-                onClick={() => go("next")}
-                className="pointer-events-auto mr-1 sm:mr-2 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-slate-700/30 bg-black/40 text-[10px] sm:text-[11px] text-slate-400 transition hover:border-slate-500/60 hover:bg-black/80 hover:text-slate-100"
-                aria-label="Next project"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-3.5 w-3.5 sm:h-4 sm:w-4"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M9.5 6 15.5 12l-6 6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </div>
 
             {/* CARDS */}
             <div className="relative z-20 h-full w-full">
@@ -679,7 +640,7 @@ useEffect(() => {
                 if (delta < -total / 2) delta += total;
 
                 const d = Math.abs(delta);
-                if (d > 3) return null; // center + up to 3 on each side
+                if (d > 3) return null;
 
                 const x = delta * 230;
                 const isActive = d === 0;
@@ -690,11 +651,9 @@ useEffect(() => {
                 const cardOpacity =
                   d === 0 ? 1 : d === 1 ? 0.6 : d === 2 ? 0.35 : 0.18;
 
-                const translateY =
-                  d === 0 ? 0 : d === 1 ? 22 : d === 2 ? 40 : 56;
+                const translateY = d === 0 ? 0 : d === 1 ? 22 : d === 2 ? 40 : 56;
                 const zIndex = 30 - d;
-                const rotateY =
-                  d === 0 ? 0 : delta < 0 ? 12 * d : -12 * d;
+                const rotateY = d === 0 ? 0 : delta < 0 ? 12 * d : -12 * d;
 
                 return (
                   <button
@@ -715,12 +674,82 @@ useEffect(() => {
                     }}
                   >
                     {/* CARD BODY WITH IMAGE */}
-                    <div className="relative overflow-hidden rounded-2xl bg-slate-950/95 shadow-[0_0_70px_rgba(15,23,42,1)] border border-slate-800/70">
+                    <div className="relative overflow-visible rounded-2xl bg-slate-950/95 shadow-[0_0_70px_rgba(15,23,42,1)] border border-slate-800/70">
+
                       <img
                         src={p.image}
                         alt={p.title}
                         className="h-56 w-56 sm:h-64 sm:w-64 md:h-80 md:w-80 lg:h-[22rem] lg:w-[22rem] object-cover"
                       />
+
+                      {/* INSIDE-CARD SEMICIRCLE ARROWS (ACTIVE ONLY) */}
+{isActive && (
+  <>
+    {/* LEFT TAB */}
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={(e) => {
+        e.stopPropagation();
+        go("prev");
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          e.stopPropagation();
+          go("prev");
+        }
+      }}
+      aria-label="Previous project"
+      className="
+        absolute left-0 top-1/2 -translate-y-1/2 z-50
+        h-20 w-6 hover:w-10
+        rounded-r-full
+        flex items-center justify-center
+        cursor-pointer select-none
+        text-slate-200/80 hover:text-slate-100
+        bg-black/10 hover:bg-black/25
+        transition-all duration-200
+      "
+      style={{ marginLeft: "-1px" }}
+    >
+      <span className="text-xl leading-none">‹</span>
+    </div>
+
+    {/* RIGHT TAB */}
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={(e) => {
+        e.stopPropagation();
+        go("next");
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          e.stopPropagation();
+          go("next");
+        }
+      }}
+      aria-label="Next project"
+      className="
+        absolute right-0 top-1/2 -translate-y-1/2 z-50
+        h-20 w-6 hover:w-10
+        rounded-l-full
+        flex items-center justify-center
+        cursor-pointer select-none
+        text-slate-200/80 hover:text-slate-100
+        bg-black/10 hover:bg-black/25
+        transition-all duration-200
+      "
+      style={{ marginRight: "-1px" }}
+    >
+      <span className="text-xl leading-none">›</span>
+    </div>
+  </>
+)}
+
+
 
                       {/* Accent gradient overlay */}
                       <div
@@ -765,379 +794,341 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* BOTTOM TEXT – hide on very small screens */}
+          {/* BOTTOM TEXT */}
           <div className="hidden sm:flex flex-col items-center gap-2 pb-2 text-center">
             <div className="flex items-center gap-2 text-[11px] text-slate-500">
-              <span className="uppercase tracking-[0.2em]">
-                Scroll for details
-              </span>
+              <span className="uppercase tracking-[0.2em]">Scroll for details</span>
               <span className="animate-bounce text-slate-400 text-xs">↓</span>
             </div>
           </div>
         </div>
       </section>
 
-{/* DETAILS SECTION (images + sticky aside) */}
-<section className="mt-10 pb-10 mx-auto w-full max-w-5xl">
-  <div
-    key={current.id}
-    className={[
-      "grid gap-10 items-start",
-      current.id === "drawings"
-        ? "grid-cols-1"
-        : "lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]",
-    ].join(" ")}
-  >
-    {/* LEFT: gallery */}
-    <div className={current.id === "drawings" ? "" : "space-y-6"}>
-      {current.id === "drawings" ? (
-        (() => {
-          const media =
-            current.gallery && current.gallery.length > 0
-              ? current.gallery
-              : [current.image];
+      {/* DETAILS SECTION (images + sticky aside) */}
+      <section className="mt-10 pb-10 mx-auto w-full max-w-5xl">
+        <div
+          key={current.id}
+          className={[
+            "grid gap-10 items-start",
+            current.id === "drawings"
+              ? "grid-cols-1"
+              : "lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]",
+          ].join(" ")}
+        >
+          {/* LEFT: gallery */}
+          <div className={current.id === "drawings" ? "" : "space-y-6"}>
+            {current.id === "drawings" ? (
+              (() => {
+                const media =
+                  current.gallery && current.gallery.length > 0
+                    ? current.gallery
+                    : [current.image];
 
-          return (
-            <div>
-              {/* Title (stronger) */}
-              <div className="mb-6 flex items-center gap-3">
-                <div
-                  className="h-[1px] w-10"
-                  style={{ backgroundColor: `${current.accent}80` }}
-                />
-                <div className="text-sm font-semibold tracking-[0.18em] uppercase text-slate-200">
-                  Artwork
-                </div>
-                <div className="flex-1 h-[1px] bg-slate-800/70" />
-              </div>
+                return (
+                  <div>
+                    {/* Title */}
+                    <div className="mb-6 flex items-center gap-3">
+                      <div
+                        className="h-[1px] w-10"
+                        style={{ backgroundColor: `${current.accent}80` }}
+                      />
+                      <div className="text-sm font-semibold tracking-[0.18em] uppercase text-slate-200">
+                        Artwork
+                      </div>
+                      <div className="flex-1 h-[1px] bg-slate-800/70" />
+                    </div>
 
-              {/* Masonry columns */}
-              <div className="columns-1 sm:columns-2 gap-6">
-                {media.map((src, idx) => (
-  <button
-    key={idx}
-    type="button"
-    onClick={() => openLightbox(src)}
-    className={[
-      "group relative w-full mb-6 break-inside-avoid overflow-hidden rounded-2xl",
-      "bg-slate-950/70 border border-slate-800/60 cursor-zoom-in",
-      "transform-gpu transition-all duration-500 ease-out",
-      detailPhase === "visible"
-        ? "opacity-100 translate-y-0"
-        : "opacity-0 translate-y-4",
-    ].join(" ")}
-    style={{
-      boxShadow: `0 0 70px ${current.accent}22`,
-      transitionDelay: `${120 + idx * 70}ms`,
-    }}
-  >
-    {/* If you want videos later, we can detect mp4 here.
-        For now keep images/gifs as <img> */}
-    <img
-      src={src}
-      alt={`Artwork ${idx + 1}`}
-      className="w-full h-auto max-h-[70vh] object-contain bg-black/20"
-      loading="lazy"
-    />
+                    {/* Masonry columns */}
+                    <div className="columns-1 sm:columns-2 gap-6">
+                      {media.map((src, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => openLightbox(src)}
+                          className={[
+                            "group relative w-full mb-6 break-inside-avoid overflow-hidden rounded-2xl",
+                            "bg-slate-950/70 border border-slate-800/60 cursor-zoom-in",
+                            "transform-gpu transition-all duration-500 ease-out",
+                            detailPhase === "visible"
+                              ? "opacity-100 translate-y-0"
+                              : "opacity-0 translate-y-4",
+                          ].join(" ")}
+                          style={{
+                            boxShadow: `0 0 70px ${current.accent}22`,
+                            transitionDelay: `${120 + idx * 70}ms`,
+                          }}
+                        >
+                          <img
+                            src={src}
+                            alt={`Artwork ${idx + 1}`}
+                            className="w-full h-auto max-h-[70vh] object-contain bg-black/20"
+                            loading="lazy"
+                          />
 
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/55 to-transparent" />
-  </button>
-))}
-
-              </div>
-            </div>
-          );
-        })()
-      ) : (
-        (() => {
-          const filtered =
-            current.gallery?.filter((media) => media !== current.image) || [];
-          const mediaToShow = filtered.length > 0 ? filtered : [current.image];
-
-          return mediaToShow.map((src, idx) => {
-            const isDriveVideo = src.includes("drive.google.com/file");
-
-            return (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => openLightbox(src)}
-                className={[
-                  "group relative block overflow-hidden rounded-2xl bg-slate-950/70 border border-slate-800/60",
-                  "transform-gpu transition-all duration-500 ease-out",
-                  detailPhase === "visible"
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-4",
-                  "cursor-zoom-in",
-                ].join(" ")}
-                style={{
-                  boxShadow: `0 0 55px ${current.accent}20`,
-                  transitionDelay: `${120 + idx * 80}ms`,
-                }}
-              >
-                {isDriveVideo ? (
-                  <iframe
-                    src={src}
-                    className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[460px] rounded-xl"
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
-                  />
-                ) : (
-                  <img
-                    src={src}
-                    alt={`${current.title} view ${idx + 1}`}
-                    className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[460px] object-cover transition-transform duration-200 group-hover:scale-[1.02]"
-                  />
-                )}
-
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
-
-                {isDriveVideo && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-8 w-8 text-white"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/55 to-transparent" />
+                        </button>
+                      ))}
                     </div>
                   </div>
-                )}
-              </button>
-            );
-          });
-        })()
-      )}
-    </div>
+                );
+              })()
+            ) : (
+              (() => {
+                const filtered =
+                  current.gallery?.filter((media) => media !== current.image) || [];
+                const mediaToShow = filtered.length > 0 ? filtered : [current.image];
 
-    {/* RIGHT: sticky panel — only for non-drawings */}
-    {current.id !== "drawings" && (
-      <aside className="sticky top-24 space-y-5 text-sm">
-        <div
-          className={[
-            "space-y-1 transform-gpu transition-all duration-400 ease-out",
-            detailPhase === "visible"
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-3",
-          ].join(" ")}
-          style={{ transitionDelay: "140ms" }}
-        >
-          <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
-            {current.role} • {current.year}
+                return mediaToShow.map((src, idx) => {
+                  const isDriveVideo = src.includes("drive.google.com/file");
+
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => openLightbox(src)}
+                      className={[
+                        "group relative block overflow-hidden rounded-2xl bg-slate-950/70 border border-slate-800/60",
+                        "transform-gpu transition-all duration-500 ease-out",
+                        detailPhase === "visible"
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 translate-y-4",
+                        "cursor-zoom-in",
+                      ].join(" ")}
+                      style={{
+                        boxShadow: `0 0 55px ${current.accent}20`,
+                        transitionDelay: `${120 + idx * 80}ms`,
+                      }}
+                    >
+                      {isDriveVideo ? (
+                        <iframe
+                          src={src}
+                          className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[460px] rounded-xl"
+                          allow="autoplay; encrypted-media"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <img
+                          src={src}
+                          alt={`${current.title} view ${idx + 1}`}
+                          className="w-full h-[260px] sm:h-[320px] md:h-[420px] lg:h-[460px] object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+                        />
+                      )}
+
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent" />
+
+                      {isDriveVideo && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="bg-black/60 rounded-full p-3 backdrop-blur-sm">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-8 w-8 text-white"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                  );
+                });
+              })()
+            )}
           </div>
 
-          
-         <h3
-  ref={current.id === "rivian" ? rivianTitleRef : null}
-  className={[
-    "text-lg font-semibold",
-    current.id === "rivian" ? "rivian-gold" : "text-slate-100",
-  ].join(" ")}
->
-  {current.title}
-</h3>
+          {/* RIGHT: sticky panel — only for non-drawings */}
+          {current.id !== "drawings" && (
+            <aside className="sticky top-24 space-y-5 text-sm">
+              <div
+                className={[
+                  "space-y-1 transform-gpu transition-all duration-400 ease-out",
+                  detailPhase === "visible"
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-3",
+                ].join(" ")}
+                style={{ transitionDelay: "140ms" }}
+              >
+                <div className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                  {current.role} • {current.year}
+                </div>
 
-
-          <p className="mt-1 text-[13px] leading-relaxed text-slate-300">
-            {current.summary}
-          </p>
-        </div>
-
-        {current.highlights && current.highlights.length > 0 && (
-          <div
-            className={[
-              "space-y-2 transform-gpu transition-all duration-400 ease-out",
-              detailPhase === "visible"
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-3",
-            ].join(" ")}
-            style={{ transitionDelay: "220ms" }}
-          >
-            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-              Highlights
-            </div>
-            <ul className="space-y-1.5 text-[13px] text-slate-300">
-              {current.highlights.map((h, idx) => (
-                <li key={idx} className="flex gap-2">
-                  <span
-                    className="mt-[6px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: current.accent }}
-                  />
-                  <span>{h}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-{/* BUTTONS */}
-<div
-  className={[
-    "pt-2 flex flex-wrap gap-2 transform-gpu transition-all duration-400 ease-out",
-    detailPhase === "visible"
-      ? "opacity-100 translate-y-0"
-      : "opacity-0 translate-y-3",
-  ].join(" ")}
-  style={{ transitionDelay: "340ms" }}
->
-  {/* GitHub */}
-  {current.github ? (
-    <a
-      href={current.github}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-    >
-      <span className="h-3.5 w-3.5">
-        <img
-          src="/logos/github.png"
-          alt="GitHub"
-          className="h-full w-full object-contain invert"
-        />
-      </span>
-      <span className="tracking-[0.12em] uppercase">Github</span>
-      <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
-        <path
-          d="M8 16l8-8M10 8h6v6"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </a>
-  ) : null}
-
-  {/* Final Design Review */}
-  {current.fdr ? (
-    <a
-      href={current.fdr}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-    >
-      <span className="h-3.5 w-3.5 flex items-center justify-center">
-        <span className="inline-block h-2.5 w-2.5 rounded-[3px] bg-slate-200" />
-      </span>
-      <span className="tracking-[0.12em] uppercase">Final Design Review</span>
-      <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
-        <path
-          d="M8 16l8-8M10 8h6v6"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </a>
-  ) : null}
-
-  {/* Polysat Website */}
-  {current.polysat_website ? (
-    <a
-      href={current.polysat_website}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-    >
-      <span className="h-3.5 w-3.5 flex items-center justify-center">
-        <img
-          src="/logos/wednesday-frog.png"
-          alt="Link"
-          className="h-3 w-3 object-contain"
-        />
-      </span>
-      <span className="tracking-[0.12em] uppercase">Website</span>
-      <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
-        <path
-          d="M8 16l8-8M10 8h6v6"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </a>
-  ) : null}
-  {current.paper && (
-  <a
-    href={current.paper}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
-  >
-    <span className="h-3.5 w-3.5 flex items-center justify-center">
-      <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#d4af37]" />
-    </span>
-    <span className="tracking-[0.12em] uppercase">Publication</span>
-    <svg viewBox="0 0 24 24" className="h-3 w-3">
-      <path
-        d="M8 16l8-8M10 8h6v6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  </a>
-)}
-
-</div>
-
-        {current.tech && current.tech.length > 0 && (
-          <div
-            className={[
-              "space-y-2 pt-1 transform-gpu transition-all duration-400 ease-out",
-              detailPhase === "visible"
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-3",
-            ].join(" ")}
-            style={{ transitionDelay: "280ms" }}
-          >
-            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
-              Stack / Tools
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {current.tech.map((t, idx) => (
-                <span
-                  key={idx}
-                  className="rounded-full border border-slate-700/70 bg-slate-950/60 px-2 py-0.5 text-[11px] text-slate-200"
+                <h3
+                  ref={current.id === "rivian" ? rivianTitleRef : null}
+                  className={[
+                    "text-lg font-semibold",
+                    current.id === "rivian" ? "rivian-gold" : "text-slate-100",
+                  ].join(" ")}
                 >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-      </aside>
-    )}
+                  {current.title}
+                </h3>
+
+                <p className="mt-1 text-[13px] leading-relaxed text-slate-300">
+                  {current.summary}
+                </p>
+              </div>
+
+              {current.highlights && current.highlights.length > 0 && (
+                <div
+                  className={[
+                    "space-y-2 transform-gpu transition-all duration-400 ease-out",
+                    detailPhase === "visible"
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-3",
+                  ].join(" ")}
+                  style={{ transitionDelay: "220ms" }}
+                >
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                    Highlights
+                  </div>
+                  <ul className="space-y-1.5 text-[13px] text-slate-300">
+                    {current.highlights.map((h, idx) => (
+                      <li key={idx} className="flex gap-2">
+                        <span
+                          className="mt-[6px] inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: current.accent }}
+                        />
+                        <span>{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* BUTTONS */}
+              <div
+                className={[
+                  "pt-2 flex flex-wrap gap-2 transform-gpu transition-all duration-400 ease-out",
+                  detailPhase === "visible"
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-3",
+                ].join(" ")}
+                style={{ transitionDelay: "340ms" }}
+              >
+                {current.github ? (
+                  <a
+                    href={current.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+                  >
+                    <span className="h-3.5 w-3.5">
+                      <img
+                        src="/logos/github.png"
+                        alt="GitHub"
+                        className="h-full w-full object-contain invert"
+                      />
+                    </span>
+                    <span className="tracking-[0.12em] uppercase">Github</span>
+                    <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+                      <path
+                        d="M8 16l8-8M10 8h6v6"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </a>
+                ) : null}
+
+                {current.fdr ? (
+                  <a
+                    href={current.fdr}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+                  >
+                    <span className="h-3.5 w-3.5 flex items-center justify-center">
+                      <span className="inline-block h-2.5 w-2.5 rounded-[3px] bg-slate-200" />
+                    </span>
+                    <span className="tracking-[0.12em] uppercase">
+                      Final Design Review
+                    </span>
+                    <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+                      <path
+                        d="M8 16l8-8M10 8h6v6"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </a>
+                ) : null}
+
+                {current.polysat_website ? (
+                  <a
+                    href={current.polysat_website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+                  >
+                    <span className="h-3.5 w-3.5 flex items-center justify-center">
+                      <img
+                        src="/logos/wednesday-frog.png"
+                        alt="Link"
+                        className="h-3 w-3 object-contain"
+                      />
+                    </span>
+                    <span className="tracking-[0.12em] uppercase">Website</span>
+                    <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden="true">
+                      <path
+                        d="M8 16l8-8M10 8h6v6"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </a>
+                ) : null}
+
+                {current.paper ? (
+                  <a
+                    href={current.paper}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-950 px-3 py-1.5 text-[11px] font-medium text-slate-200 hover:border-slate-300 hover:bg-slate-900 transition"
+                  >
+                    <span className="h-3.5 w-3.5 flex items-center justify-center">
+                      <span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#d4af37]" />
+                    </span>
+                    <span className="tracking-[0.12em] uppercase">Publication</span>
+                    <svg viewBox="0 0 24 24" className="h-3 w-3">
+                      <path
+                        d="M8 16l8-8M10 8h6v6"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </a>
+                ) : null}
+              </div>
+            </aside>
+          )}
+        </div>
+      </section>
+
+      {/* FULL-WIDTH DEEP DIVE, BELOW ALL PHOTOS */}
+      <ProjectDeepDive project={current} />
+
+      {/* LIGHTBOX OVERLAY WITH ZOOM ANIMATION + DRIVE SUPPORT */}
+      {lightboxSrc && (
+        <Lightbox src={lightboxSrc} zoomed={lightboxZoomed} onClose={closeLightbox} />
+      )}
+        </>
   </div>
-
-  
-</section>
-
-{/* FULL-WIDTH DEEP DIVE, BELOW ALL PHOTOS */}
-<ProjectDeepDive project={current} />
-
-{/* LIGHTBOX OVERLAY WITH ZOOM ANIMATION + DRIVE SUPPORT */}
-{lightboxSrc && (
-  <Lightbox
-    src={lightboxSrc}
-    zoomed={lightboxZoomed}
-    onClose={closeLightbox}
-  />
-)}
-
-
-    </>
   );
 }
+
+
 
 
 /* ==============================
