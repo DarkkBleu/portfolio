@@ -674,7 +674,8 @@ useEffect(() => {
                     }}
                   >
                     {/* CARD BODY WITH IMAGE */}
-                    <div className="relative overflow-visible rounded-2xl bg-slate-950/95 shadow-[0_0_70px_rgba(15,23,42,1)] border border-slate-800/70">
+                    <div className="relative overflow-hidden rounded-2xl bg-slate-950/95 shadow-[0_0_70px_rgba(15,23,42,1)] border border-slate-800/70 isolate">
+
 
                       <img
                         src={p.image}
