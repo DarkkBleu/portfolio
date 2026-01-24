@@ -113,13 +113,13 @@ const PROJECTS: Project[] = [
     summary:
       "Worked on mechanical systems.",
     image: "/projects/cubesat-main.jpg",
-    polysat_website: "https://www.polysat.org/in-development",
+    polysat_website: "https://www.nasa.gov/wp-content/uploads/2023/12/9.-2022-amdrohp-stp-tech-expo.pdf",
     gallery: [
       "/projects/cubesat-main.jpg",
       "/projects/battery.gif",
-      "/projects/cubesat-amdrohp.jpg",
       "/projects/cubesat-drag-sail.jpg",
       "/projects/cubesat-battery-pack.jpg",
+      "/projects/cubesat-amdrohp.jpg",
     ],
     
     highlights: [
@@ -166,7 +166,7 @@ const PROJECTS: Project[] = [
     role: "CNC",
     year: "2023",
     summary:
-      "Architectural structure meant for mediation.",
+      "Architectural structure meant for meditation.",
     image: "/projects/center-main.jpg",
     paper: "https://digitalcommons.calpoly.edu/arcesp/199/",
 
